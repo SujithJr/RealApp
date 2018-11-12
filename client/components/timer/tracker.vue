@@ -72,8 +72,8 @@ export default {
             total: '',
             timerSet: '',
             show: true,
-            times: '0:00:00',
-            object: ''
+            // times: '0:00:00',
+            // object: ''
         }
     },
     methods: {
