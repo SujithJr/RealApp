@@ -21,6 +21,8 @@
                         <div class="c-wrapper">
                             <h2 class="c-timer">
                                 <div class="c-ticker">
+                                    <!-- <template>{{ times }}</template> -->
+                                    <!-- <template v-else>0:00:00</template> -->
                                     <span id="hrs">{{ hrs }}</span>:<span id="mins">{{ mins }}</span>:<span id="sec">{{ sec }}</span>
                                 </div>
                                 <div class="c-control">
@@ -44,6 +46,7 @@
                     </v-card>
                 </v-flex>
         </v-layout>
+                <h2>End Time: {{ timer }}</h2>
     </div>
 </template>
 
@@ -51,6 +54,7 @@
 import prefixZero from '@/filters/prefix-zero'
 import moment from 'moment'
 import axios from 'axios'
+import * as Cookies from "js-cookie";
 
 export default {
     components: {
@@ -68,11 +72,14 @@ export default {
             total: '',
             timerSet: '',
             show: true,
+            times: '0:00:00',
+            object: ''
         }
     },
     methods: {
         startTimer() {
             this.show = !this.show
+            this.$store.dispatch('running', true)
             this.timerSet = setInterval(() => {
                 this.sec = parseInt(this.sec) + 1  // Increments 'seconds' counter in the timer by 1 on each interval
                 if (this.sec < 10 || this.sec === 0) {  // Adds a trialing zero to the 'seconds' counter if it is less than 10 (eg: 01)
@@ -98,7 +105,7 @@ export default {
                         this.mins = this.zeroSec + 0
                     }
                 }
-
+            this.$store.dispatch('startedTimer', { hrs: this.hrs, mins: this.mins, sec: this.sec })
             }, 1000);
         },
         // minutes(data) {
@@ -121,11 +128,13 @@ export default {
         // },
         stop() {
             this.show = !this.show
+            this.$store.dispatch('running', false)
             clearInterval(this.timerSet)
             this.stopper()
         },
         stopper() {
             // const tick = this.startTime
+            // this.endingTime
             const ticking = this.hrs + '' + this.mins + '' + this.sec  // Connects the hr, min and sec counter values (eg: 01:23:45 => 012345)
             const timerValue = moment(ticking, "hmmss").format("HH:mm:ss")  // Converts the connected timer value into time format
             const timeDuration = [this.startTime, timerValue]
@@ -133,17 +142,51 @@ export default {
             this.total = timerValue
             this.start = moment.utc(this.startTime, "hh:mm:ss A").format("hh:mm:ss A")
             this.end = moment.utc(totalTime.asMilliseconds()).format("hh:mm:ss A")
-            setTimeout(() => { // Resets the counter after 300ms once the timer stops
-                this.hrs = 0;
-                this.mins = this.zeroSec + 0
-                this.sec = this.zeroSec + 0
-            }, 300)
+            this.$store.dispatch('stopTimer', { hrs: 0, mins: '0'+0, sec: '0'+0 })
+            // setTimeout(() => { // Resets the counter after 300ms once the timer stops
+            // }, 300)
+            // return this.end
         },
     },
     mounted() {
-        
+        setTimeout(() => {
+            this.started
+        }, 100)
     },
     computed: {
+        timer () {
+            // if (!this.show) {
+            //     console.log(Cookies.getJSON('vuex').startedTimer)
+            //     return Cookies.getJSON('vuex').startedTimer
+            // }
+            // this.object = Cookies.get('vuex').startedTimer
+            this.hrs = this.$store.state.startedTimer.hrs
+            this.mins = this.$store.state.startedTimer.mins
+            this.sec = this.$store.state.startedTimer.sec
+            return this.hrs + ':' + this.mins + ':' + this.sec
+            
+        },
+        running () {
+            console.log('CONSOLE RUNNING: ', this.$store.getters.running)
+            return this.$store.getters.running
+        },
+        started () {
+            console.log('MOUNTED: ', this.$store.getters.running)
+            // this.times = this.stopper()
+            if (this.$store.getters.running === true) {
+                // this.show = this.show
+                this.hrs = this.$store.state.startedTimer.hrs
+                this.mins = this.$store.state.startedTimer.mins
+                this.sec = this.$store.state.startedTimer.sec
+                this.startTimer()
+                // this.$store.dispatch('startedTimer', Cookies.get('vuex').startedTimer)
+                // this.timer
+            }
+        }
+        // endingTime () {
+        //     console.log(Cookies.getJSON('vuex').startedTimer)
+        //     return Cookies.getJSON('vuex').startedTimer
+        // }
     }
 }
 </script>

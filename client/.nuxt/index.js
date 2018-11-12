@@ -12,6 +12,7 @@ import { createStore } from './store.js'
 
 /* Plugins */
 import nuxt_plugin_vuetify_165b1c58 from 'nuxt_plugin_vuetify_165b1c58' // Source: ../plugins/vuetify
+import nuxt_plugin_persistedstate_519eff42 from 'nuxt_plugin_persistedstate_519eff42' // Source: ../plugins/persistedstate.js (ssr: false)
 
 
 // Component: <no-ssr>
@@ -157,6 +158,9 @@ async function createApp (ssrContext) {
   
   if (typeof nuxt_plugin_vuetify_165b1c58 === 'function') await nuxt_plugin_vuetify_165b1c58(app.context, inject)
   
+  if (process.client) { 
+    if (typeof nuxt_plugin_persistedstate_519eff42 === 'function') await nuxt_plugin_persistedstate_519eff42(app.context, inject)
+  }
 
   // If server-side, wait for async component to be resolved first
   if (process.server && ssrContext && ssrContext.url) {

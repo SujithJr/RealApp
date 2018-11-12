@@ -3,19 +3,36 @@ const API_URL = 'http://localhost:4000/tracker'
 
 import axios from 'axios'
 import Vuex from 'vuex'
+import createPersistedState from 'vuex-persistedstate';
+import Cookies from 'js-cookie';
+
 
 export default {
     state:{
-        projects: []
+        startedTimer: '0:00:00'
     },
 
+    // plugins: [createPersistedState({
+    //     storage: {
+    //         getItem: key => Cookies.get(key),
+    //         setItem: (key, value) => Cookies.set(key, value, {
+    //             expires: 3,
+    //             secure: true
+    //         }),
+    //         removeItem: key => Cookies.remove(key)
+    //     }
+    // })],
+
     mutations: {
-        ADD_PROJECT (state, payload) {
-            state.projects.push(payload)
-        },
-        GET_PROJECT (state, payload) {
-            state.projects = payload
-        },
+        RUNNING_TIMER (state, payload) {
+            state.startedTimer = payload
+        }
+        // ADD_PROJECT (state, payload) {
+        //     state.projects.push(payload)
+        // },
+        // GET_PROJECT (state, payload) {
+        //     state.projects = payload
+        // },
         // EDITED_CLIENT (state, payload) {
         //     const client = state.clients.find(client => { return client._id === payload._id })
         //     if (client === undefined || client === '') {
@@ -29,26 +46,9 @@ export default {
     },
 
     actions: {
-        async addProject ({ commit, dispatch}, data) {
-            console.log(data.name)
-            try {
-                const res = await axios.post(API_URL, { name: data.name, client: data.client })
-                console.log(res.data.project)
-                commit('ADD_PROJECT', res.data.project)
-            } catch(e) {
-                console.log(e)
-            }
-        },
-
-        async getProject ({ commit, dispatch}) {
-            try {
-                const res = await axios.get(API_URL)
-                console.log(res.data.project)
-                commit('GET_PROJECT', res.data.project)
-            } catch(e) {
-                console.log(e)
-            }
-        },
+        startedTimer ({commit}, data) {
+            commit('RUNNING_TIMER', data)
+        }
 
         // async deleteClient ({commit}, data) {
         //     const clientId = data._id
