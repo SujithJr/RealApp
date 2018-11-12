@@ -3,7 +3,6 @@ const API_URL = 'http://localhost:4000/clients'
 
 import axios from 'axios'
 import Vuex from 'vuex'
-import store from '..';
 
 export default {
     state:{
@@ -32,7 +31,7 @@ export default {
     actions: {
         async addClient ({ commit, dispatch}, data) {
             try {
-                const res = await axios.post(API_URL, { name: data })
+                const res = await axios.post(API_URL, { name: data.name, color: data.color })
                 console.log(res.data.doc)
                 commit('ADD_CLIENT', res.data.doc)
             } catch(e) {

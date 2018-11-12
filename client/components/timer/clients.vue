@@ -46,12 +46,10 @@
                     :items="getClients"
                     hide-actions
                     class="elevation-1 mt-4">
-                    <!-- <div v-for="(album, index) in albumData" :key="index"> -->
                     <template slot="items" slot-scope="props">
-                        <!-- <td>{{ desserts.name }}</td> -->
-                        <td class="text-xs-left" >{{ props.item.name}}</td>
-                        <td class="text-xs-left" ><v-chip>
-                            <v-avatar class="teal">{{ props.item.name[0].toUpperCase() }}</v-avatar>
+                        <td class="text-xs-left font-weight-bold">{{ props.item.name}}</td>
+                        <td class="text-xs-left"><v-chip>
+                            <v-avatar class="something" :color="props.item.color">{{ props.item.name[0].toUpperCase() }}</v-avatar>
                             {{ props.item.name }}
                         </v-chip></td>
                         <td class="text-xs-left layout">
@@ -62,8 +60,6 @@
                                 delete
                             </v-icon>
                         </td>
-                        <!-- <td class="text-xs-right">{{ desserts.protein }}</td>
-                        <td class="text-xs-right">{{ desserts.iron }}</td> -->
                     </template>
                     <template slot="no-data">
                         <v-alert :value="true" color="red" icon="warning">
@@ -84,8 +80,10 @@ import axios from 'axios'
 
 export default {
     data: () => ({
-      dialog: false,
-      headers: [
+        dialog: false,
+        colorType: ['#B71C1C', '#880E4F', '#4A148C', '#1A237E', '#01579B', '#006064', '#004D40', '#1B5E20', '#E65100', '#3E2723', '#263238'],
+        color: '',
+        headers: [
             { 
                 text: 'Client Name', 
                 value: 'name'
@@ -117,7 +115,7 @@ export default {
     },
     computed: {
         getClients () {
-            return this.$store.state.timer.clients
+            return this.$store.getters.getClients
         },
     },
     watch: {
@@ -128,7 +126,9 @@ export default {
     methods: {
         addClient () {
             const name = this.clientName
-            this.$store.dispatch('addClient', name)
+            const colorOne = this.colorType[Math.floor(Math.random() * this.colorType.length)]
+            this.color = colorOne
+            this.$store.dispatch('addClient', { name: name, color: this.color})
             this.clientName = ''
             this.getClients
         },
@@ -171,6 +171,10 @@ export default {
 </script>
 
 <style scoped>
+.something {
+    color: #fff;
+    /* background-color: #B71C1C; */
+}
 .c-search {
     display: flex;
     padding: 0.5rem 1rem;

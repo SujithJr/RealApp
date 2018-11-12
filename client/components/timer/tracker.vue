@@ -74,89 +74,71 @@ export default {
         startTimer() {
             this.show = !this.show
             this.timerSet = setInterval(() => {
-
-                // Increments 'seconds' counter in the timer by 1 on each interval
-                this.sec = parseInt(this.sec) + 1;
-
-                // Adds a trialing zero to the 'seconds' counter if it is less than 10 (eg: 01)
-                if (this.sec < 10 || this.sec === 0) {
-                    this.sec = this.zeroSec + this.sec;
+                this.sec = parseInt(this.sec) + 1  // Increments 'seconds' counter in the timer by 1 on each interval
+                if (this.sec < 10 || this.sec === 0) {  // Adds a trialing zero to the 'seconds' counter if it is less than 10 (eg: 01)
+                    this.sec = this.zeroSec + this.sec
                 }
                 if (this.sec >= 60) {
-                    this.minutes(60);
+                    // this.minutes(60)
+                    if (parseInt(this.sec) >= 60) {
+                        this.mins = parseInt(this.mins) + 1
+                        if (this.mins < 10 || this.mins === 0) {
+                            this.mins = this.zeroSec + this.mins
+                        }
+                        this.sec = this.zeroSec + 0
+                    }
                 }
                 if (this.mins >= 60) {
-                    this.hours(60);
+                    // this.hours(60)
+                    if (parseInt(this.mins) >= 60) {
+                        this.hrs = parseInt(this.hrs) + 1
+                        if (this.hrs < 10 || this.hrs === 0) {
+                            this.hrs = this.zeroSec + this.hrs
+                        }
+                        this.mins = this.zeroSec + 0
+                    }
                 }
 
             }, 1000);
         },
-        minutes(data) {
-            if (parseInt(this.sec) >= data) {
-                this.mins = parseInt(this.mins) + 1;
-                if (this.mins < 10 || this.mins === 0) {
-                    this.mins = this.zeroSec + this.mins;
-                }
-               this.sec = this.zeroSec + 0;
-            }
-        },
-        hours(data) {
-            if (parseInt(this.mins) >= data) {
-                this.hrs = parseInt(this.hrs) + 1;
-                if (this.hrs < 10 || this.hrs === 0) {
-                    this.hrs = this.zeroSec + this.hrs;
-                }
-                this.mins = this.zeroSec + 0;
-            }
-        },
+        // minutes(data) {
+        //     if (parseInt(this.sec) >= data) {
+        //         this.mins = parseInt(this.mins) + 1
+        //         if (this.mins < 10 || this.mins === 0) {
+        //             this.mins = this.zeroSec + this.mins
+        //         }
+        //        this.sec = this.zeroSec + 0
+        //     }
+        // },
+        // hours(data) {
+        //     if (parseInt(this.mins) >= data) {
+        //         this.hrs = parseInt(this.hrs) + 1
+        //         if (this.hrs < 10 || this.hrs === 0) {
+        //             this.hrs = this.zeroSec + this.hrs
+        //         }
+        //         this.mins = this.zeroSec + 0
+        //     }
+        // },
         stop() {
-            this.show = !this.show;
-            clearInterval(this.timerSet);
-            this.stopper();
+            this.show = !this.show
+            clearInterval(this.timerSet)
+            this.stopper()
         },
         stopper() {
-            const tick = this.startTime;
-
-            // Connects the hrs, mins and sec counter values (eg: 01:23:45 => 012345)
-            const ticking = this.hrs + '' + this.mins + '' + this.sec;
-            
-            // Converts the connected timer value into time format
-            const timerValue = moment(ticking, "hmmss").format("HH:mm:ss");
-
-            const timeDuration = [tick, timerValue];
-
-            // Adds the start time (tick) and counter value (timerValue)
-            const totalTime = timeDuration.slice(1).reduce((prev, cur) => moment.duration(cur).add(prev), moment.duration(timeDuration[0]));
-
-            this.total = timerValue;
-            this.start = moment.utc(this.startTime, "hh:mm:ss A").format("hh:mm:ss A");
-            this.end = moment.utc(totalTime.asMilliseconds()).format("hh:mm:ss A");
-
-            // Resets the counter after 500ms once the timer stops
-            setTimeout(() => {
+            // const tick = this.startTime
+            const ticking = this.hrs + '' + this.mins + '' + this.sec  // Connects the hr, min and sec counter values (eg: 01:23:45 => 012345)
+            const timerValue = moment(ticking, "hmmss").format("HH:mm:ss")  // Converts the connected timer value into time format
+            const timeDuration = [this.startTime, timerValue]
+            const totalTime = timeDuration.slice(1).reduce((prev, cur) => moment.duration(cur).add(prev), moment.duration(timeDuration[0]))  // Adds the start time (tick) and counter value (timerValue)
+            this.total = timerValue
+            this.start = moment.utc(this.startTime, "hh:mm:ss A").format("hh:mm:ss A")
+            this.end = moment.utc(totalTime.asMilliseconds()).format("hh:mm:ss A")
+            setTimeout(() => { // Resets the counter after 300ms once the timer stops
                 this.hrs = 0;
-                this.mins = this.zeroSec + 0;
-                this.sec = this.zeroSec + 0;
-            }, 500);
+                this.mins = this.zeroSec + 0
+                this.sec = this.zeroSec + 0
+            }, 300)
         },
-        save () {
-            this.snack = true
-            this.snackColor = 'success'
-            this.snackText = 'Data saved'
-        },
-        cancel () {
-            this.snack = true
-            this.snackColor = 'error'
-            this.snackText = 'Canceled'
-        },
-        open () {
-            this.snack = true
-            this.snackColor = 'info'
-            this.snackText = 'Dialog opened'
-        },
-        close () {
-            console.log('Dialog closed')
-        }
     },
     mounted() {
         
@@ -190,45 +172,23 @@ body {
     margin-left: -11rem;
 }
 .c-wrapper {
-    /* display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between; */
     position: relative;
     width: 100%;
     text-align: center;
     margin-top: 2rem;
-    /* height: 100%; */
-    /* height: 60px; */
-    /* background: #d13739; */
-    /* overflow: hidden; */
-    /* padding-left: 1rem; */
 }
 .c-timer {
-    font-size: 4rem;
+    font-size: 5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* background: #333; */
     padding: 1rem;
-    /* border-radius: 5px; */
     color: rgb(255, 255, 255, 0.85);
-    /* position: absolute;
-    top: 50%;
-    right: 1rem;
-    transform: translateY(-50%); */
-    /* max-width: 280px; */
     width: 100%;
 }
 .c-timer a {
-    /* background: brown; */
     text-decoration: none;
-    /* padding: 10px 20px; */
-    /* margin-left: 1rem; */
-    /* font-size: 2rem; */
-    /* border-radius: 5px; */
     color: rgb(255, 255, 255, 0.85);
-    /* border-radius: 50%; */
     outline: 0;
     width: 100%;
     height: 100%;
@@ -238,8 +198,8 @@ body {
     vertical-align: middle;
     background: brown;
     color: #fff;
-    font-size: 3.25rem;
-    border-radius: 50%;
+    font-size: 5rem;
+    border-radius: 25%;
 }
 .c-timer-hour {
     display: flex;
@@ -257,8 +217,8 @@ body {
     color: yellowgreen;
 }
 .c-control {
-    width: 50px;
-    height: 50px;
+    width: 70px;
+    height: 70px;
     line-height: 45px;
     text-align: center;
 }

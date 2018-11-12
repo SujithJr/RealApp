@@ -25,7 +25,6 @@ import axios from 'axios'
 export default {
     data() {
         return {
-
         }
     },
     components: { navbar, inNavbar },
@@ -33,6 +32,7 @@ export default {
         
     },
     computed: {
+        
     }
 }
 </script>

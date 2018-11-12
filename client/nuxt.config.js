@@ -40,7 +40,20 @@ module.exports = {
   modules: [
     // Doc: https://github.com/nuxt-community/axios-module#usage
     // '@nuxtjs/axios',
-  ],
+    ['vue-warehouse/nuxt',
+        {
+            vuex: true,
+            plugins: [
+                'store/plugins/expire',
+                'store/plugins/defaults'
+            ],
+            storages: [
+                'store/storages/localStorage',
+                'store/storages/cookieStorage'
+            ]
+        }
+    ],
+],
   /*
   ** Axios module configuration
   */

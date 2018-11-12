@@ -2,14 +2,16 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 Vue.use(Vuex)
 
-import timer from './modules/timer'
+import clients from './modules/clients'
+import projects from './modules/projects'
 
 const store = () => {
     return new Vuex.Store({
         namespaced: true,
         strict: false,
         modules: {
-            timer
+            clients,
+            projects
         },
 
         state: {

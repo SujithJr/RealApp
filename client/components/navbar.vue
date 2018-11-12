@@ -118,8 +118,8 @@ export default {
 </script>
 
 
-<style>
-.v-navigation-drawer--mini-variant {
+<style scoped>
+.theme--light .v-navigation-drawer{
     background: #101535 !important;
 }
 .v-list__tile__action i {
