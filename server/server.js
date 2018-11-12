@@ -10,10 +10,14 @@ const {ObjectID} = require('mongodb');
 const {mongoose} = require('./db/mongoose');
 const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
+const {Client} = require('./models/clients');
+const {Project} = require('./models/projects');
 
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
+
+// --- API -> Todo --- //
 
 app.post('/todos', async (req, res) => {
     const todo = new Todo({
@@ -95,6 +99,83 @@ app.patch('/todos/:id', async (req, res) => {
         }
         res.send({todo});
     } catch(e) {
+        res.status(400).send(e);
+    }
+});
+
+// --- API -> Clients  --- //
+
+app.post('/clients', async (req, res) => {
+    const client = new Client({
+        name: req.body.name
+    });
+
+    try {
+        const doc = await client.save();
+        res.send({doc});
+    } catch (e) {
+        res.status(400).send(e);
+    }
+});
+
+app.get('/clients', async (req, res) => {
+    try {
+        const clients = await Client.find();
+        res.send({clients});
+    } catch(e) {
+        res.send(400).send(e);
+    }
+});
+
+app.delete('/clients/:id', async (req, res) => {
+    const id = req.params.id;
+
+    if (!ObjectID.isValid(id)) {
+        return res.status(400).send();
+    }
+
+    try {
+        const client = await Client.findOneAndRemove({_id: id});
+        if (!client) {
+            res.status(404).send();
+        }
+        res.send({client});
+    } catch(e) {
+        res.status(400).send(e);
+    }
+});
+
+app.patch('/clients/:id', async (req, res) => {
+    const id = req.params.id;
+    const body = _.pick(req.body, ['name']);
+
+    if (!ObjectID.isValid(id)) {
+        return res.status(404).send();
+    }
+
+    try {
+        const client = await Client.findOneAndUpdate({_id: id}, {$set: body}, {new: true})
+        if (!client) {
+            return res.status(404).send();
+        }
+        res.send({client})
+    } catch(e) {
+        res.status(400).send(e);
+    }
+});
+
+// --- API -> Add Projects --- //
+
+app.post('/projects', async (req, res) => {
+    const proj = new Project({
+        name: req.body.name,
+        client: req.body.client
+    })
+
+    try {
+        const doc = await proj.save();
+        res.send({doc}); 
+    } catch(e) {    
         res.status(400).send(e);
     }
 });
