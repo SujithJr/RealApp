@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
+const _14152d14 = () => import('../pages/Timer.vue' /* webpackChunkName: "pages/Timer" */).then(m => m.default || m)
 const _cbec3a06 = () => import('../pages/List.vue' /* webpackChunkName: "pages/List" */).then(m => m.default || m)
 const _4b34dca3 = () => import('../pages/index.vue' /* webpackChunkName: "pages/index" */).then(m => m.default || m)
 
@@ -63,6 +64,11 @@ export function createRouter () {
     linkExactActiveClass: 'nuxt-link-exact-active',
     scrollBehavior,
     routes: [
+		{
+			path: "/Timer",
+			component: _14152d14,
+			name: "Timer"
+		},
 		{
 			path: "/List",
 			component: _cbec3a06,

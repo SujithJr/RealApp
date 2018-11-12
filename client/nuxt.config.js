@@ -52,6 +52,7 @@ module.exports = {
   ** Build configuration
   */
   build: {
+    //   vendor: ['axios', 'vuetify', 'vue-warehouse/nuxt'],
     /*
     ** You can extend webpack config here
     */

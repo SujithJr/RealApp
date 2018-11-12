@@ -39,7 +39,6 @@ import axios from 'axios'
                 text: this.message
             }).then((res) => {
                 this.getTodos
-                // console.log(res.data.doc)
                 this.list.push(res.data.doc)
             }).catch((e) => console.log(e));
         }
@@ -50,7 +49,6 @@ import axios from 'axios'
     computed: {
         getTodos() {
             axios.get(API_URL).then((res) => {
-                console.log(res.data)
                 return this.list = res.data.todos
             });
         },
