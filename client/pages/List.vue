@@ -1,6 +1,5 @@
 <template>
 <div>
-    <navbar></navbar>
     <div class="form">
         <form @submit.prevent="addTodo">
             <v-text-field type="text" class="text" v-model="message" placeholder="Message"></v-text-field>
@@ -21,7 +20,6 @@ const API_URL = 'http://localhost:4000/todos'
 
 import prefixZero from '@/filters/prefix-zero'
 import moment from 'moment'
-import navbar from '@/components/navbar'
 import axios from 'axios'
     export default {
     data() {
@@ -31,7 +29,6 @@ import axios from 'axios'
             message: ''
         }
     },
-    components: { navbar },
     methods: {
         addTodo() {
             console.log(this.message)

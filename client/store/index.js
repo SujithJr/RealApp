@@ -7,17 +7,20 @@ Vue.use(Vuex)
 import clients from './modules/clients'
 import projects from './modules/projects'
 // import tracker from './modules/tracker'
-let cookieStorage = {
-    getItem: function(key) {
-        return Cookies.getJSON(key);
-    },
-    setItem: function(key, value) {
-        return Cookies.set(key, value, {expires: 3, secure: false});
-    },
-    removeItem: function(key) {
-        return Cookies.remove(key);
-    }
-};
+
+const API_URL = 'http://localhost:4000/tracker'
+
+// let cookieStorage = {
+//     getItem: function(key) {
+//         return Cookies.getJSON(key);
+//     },
+//     setItem: function(key, value) {
+//         return Cookies.set(key, value, {expires: 3, secure: false});
+//     },
+//     removeItem: function(key) {
+//         return Cookies.remove(key);
+//     }
+// };
 
 // export default (context) => {
 //   createPersistedState({
@@ -38,10 +41,12 @@ const store = () => {
 
         state: {
             startedTimer: '',
-            hrs: '',
-            mins: '',
-            sec: '',
-            running: false
+            // hrs: '',
+            // mins: '',
+            // sec: '',
+            running: false,
+            routeName: '',
+            initialTime: ''
         },
         
         plugins: [createPersistedState({
@@ -60,12 +65,15 @@ const store = () => {
         mutations: {
             RUNNING_TIMER (state, payload) {
                 state.startedTimer = payload
-                state.hrs = payload.hrs
-                state.mins = payload.mins
-                state.sec = payload.sec
+                // state.hrs = payload.hrs
+                // state.mins = payload.mins
+                // state.sec = payload.sec
             },
             RUNNING (state, payload) {
                 state.running = payload
+            },
+            INITIAL_TIME (state, payload) {
+                state.initialTime = payload
             }
         },
 
@@ -78,12 +86,21 @@ const store = () => {
             },
             stopTimer ({commit}, payload) {
                 commit('RUNNING_TIMER', payload)
-            }
+            },
+            initialTime ({commit}, payload) {
+                commit('INITIAL_TIME', payload)
+            },
+            // trackerData ({commit}, payload) {
+            //     axios.
+            // }
         },
 
         getters: {
             running (state) {
                 return state.running
+            },
+            initialTime (state) {
+                return state.initialTime
             }
         }
     })

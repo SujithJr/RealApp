@@ -4,6 +4,7 @@
         "dev": "nuxt"
     },
     "dependencies": {
+        "@nuxtjs/router": "^1.1.0",
         "axios": "^0.18.0",
         "js-cookie": "^2.2.0",
         "moment": "^2.22.2",

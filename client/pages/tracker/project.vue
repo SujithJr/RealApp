@@ -3,7 +3,7 @@
         <v-layout>
             <v-flex xs12 md12 lg12>
                 <v-btn round color="red" class="ma-0" dark depressed @click.prevent="createProject()"><v-icon>add</v-icon>CREATE PROJECT</v-btn>
-                <v-dialog v-model="dialog" max-width="500px">
+                <v-dialog v-model="dialog" max-width="500px" :fullscreen="$vuetify.breakpoint.xsOnly">
                     <v-card>
                         <v-card-title>
                             <span class="headline">New Project</span>

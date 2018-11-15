@@ -11,7 +11,7 @@
             <v-list dense>
                 <v-list-tile avatar>
                     <v-list-tile-avatar>
-                        <img src="https://randomuser.me/api/portraits/men/85.jpg">
+                        <img src="./../static/images/sanju.jpeg">
                     </v-list-tile-avatar>
 
                     <v-list-tile-content>
@@ -45,57 +45,6 @@
             </v-list>
         </v-toolbar>
         </v-navigation-drawer>
-        <!-- <v-toolbar color="indigo" dark fixed app>
-            <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-            <v-toolbar-title>Real App</v-toolbar-title>
-        </v-toolbar> -->
-
-        <!-- <v-navigation-drawer
-            :mini-variant.sync="mini"
-            v-model="drawer"
-            hide-overlay
-            stateless
-        >
-            <v-toolbar flat class="transparent">
-            <v-list class="pa-0">
-                <v-list-tile avatar>
-                <v-list-tile-avatar>
-                    <img src="https://randomuser.me/api/portraits/men/85.jpg">
-                </v-list-tile-avatar>
-
-                <v-list-tile-content>
-                    <v-list-tile-title>User</v-list-tile-title>
-                </v-list-tile-content>
-
-                <v-list-tile-action>
-                    <v-btn
-                    icon
-                    @click.stop="mini = !mini"
-                    >
-                    <v-icon>chevron_left</v-icon>
-                    </v-btn>
-                </v-list-tile-action>
-                </v-list-tile>
-            
-
-            <v-divider></v-divider>
-
-            <v-list-tile
-                v-for="item in menuItems"
-                :key="item.title"
-                :to="item.link"
-            >
-                <v-list-tile-action>
-                <v-icon>{{ item.icon }}</v-icon>
-                </v-list-tile-action>
-
-                <v-list-tile-content>
-                <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-                </v-list-tile-content>
-            </v-list-tile>
-            </v-list>
-            </v-toolbar>
-        </v-navigation-drawer> -->
 </template>
 
 <script>
@@ -104,7 +53,8 @@ export default {
         return {
             menuItems: [
                 { title: 'Home', link: '/', icon: 'home'},
-                { title: 'Todo', link: '/List', icon: 'question_answer'}
+                { title: 'Todo', link: '/List', icon: 'question_answer'},
+                { title: 'Tracker', link: '/tracker', icon: 'dashboard'}
             ],
             mini: true,
             right: null,
@@ -112,7 +62,9 @@ export default {
         }
     },
     computed: {
-
+        // color () {
+        //     if (this.$route.name === )
+        // }
     }
 }
 </script>
@@ -140,7 +92,7 @@ export default {
     color: #fff;
     font-weight: 800;
 }
-.v-list__tile__title a.nuxt-link-exact-active {
+.v-list__tile__title a.router-link-exact-active {
     color: #d13739;
     font-weight: 800;
     /* background: #ccc;
