@@ -12,6 +12,7 @@ const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
 const {Client} = require('./models/clients');
 const {Project} = require('./models/projects');
+const {Tracker} = require('./models/tracker');
 
 const app = express();
 app.use(bodyParser.json());
@@ -107,7 +108,8 @@ app.patch('/todos/:id', async (req, res) => {
 
 app.post('/clients', async (req, res) => {
     const client = new Client({
-        name: req.body.name
+        name: req.body.name,
+        color: req.body.color
     });
 
     try {
@@ -164,7 +166,7 @@ app.patch('/clients/:id', async (req, res) => {
     }
 });
 
-// --- API -> Add Projects --- //
+// --- API ->  Projects --- //
 
 app.post('/projects', async (req, res) => {
     const proj = new Project({
@@ -173,12 +175,72 @@ app.post('/projects', async (req, res) => {
     })
 
     try {
-        const doc = await proj.save();
-        res.send({doc}); 
+        const project = await proj.save();
+        res.send({project}); 
     } catch(e) {    
         res.status(400).send(e);
     }
 });
+
+app.get('/projects', async (req, res) => {
+
+    try {
+        const project = await Project.find();
+        res.send({project}); 
+    } catch(e) {    
+        res.status(400).send(e);
+    }
+});
+
+
+// --- API ->  Tracker --- //
+
+app.post('/tracker', async (req, res) => {
+    const track = new Tracker({
+        title: req.body.title,
+        projClient: req.body.projClient,
+        startTime: req.body.startTime,
+        endTime: req.body.endTime,
+        total: req.body.total
+    })
+
+    try {
+        const tracker = await track.save()
+        res.send({tracker})
+    } catch(e) {
+        res.status(400).send(e)
+    }
+});
+
+app.get('/tracker', async (req, res) => {
+
+    try {
+        const tracker = await Tracker.find();
+        res.send({tracker});
+    } catch (e) {
+        res.status(400).send(e);
+    }
+});
+
+app.patch('/tracker/:id', async (req, res) => {
+    const id = req.params.id;
+    const body = _.pick(req.body, ['title', 'projClient', 'startTime', 'endTime', 'total']);
+
+    if (!ObjectID.isValid(id)) {
+        return res.status(404).send();
+    }
+
+    try {
+        const track = await Tracker.findOneAndUpdate({_id: id}, {$set: body}, {new: true})
+        if (!track) {
+            return res.status(404).send();
+        }
+        res.send({track})
+    } catch(e) {
+        res.status(400).send(e);
+    }
+});
+
 
 const port = process.env.PORT || 4000;
 

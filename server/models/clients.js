@@ -7,6 +7,11 @@ const Client = mongoose.model('Clients', {
         minlength: 1,
         trim: true
     },
+    color: {
+        type: String,
+        minlength: 1,
+        trim: true
+    }
 });
 
 module.exports = {
