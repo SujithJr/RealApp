@@ -59,4 +59,7 @@ ul {
     padding-left: 0 !important;
     list-style-type: none;
 }
+p {
+    margin-bottom: 0 !important;
+}
 </style>
