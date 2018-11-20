@@ -115,14 +115,15 @@ export default {
                 projClient: payload.projClient,
                 startTime: payload.startTime,
                 endTime: payload.endTime,
-                total: payload.total
+                total: payload.total,
+                flag: payload.flag
             }
             
             try {
                 const res = await axios.post(API_URL, trackForm)
                 // commit('SINGLE_TRACKER_DATA', res.data.tracker)
-                commit('CURRENT_TRACKER', res.data.tracker)
                 console.log(res.data.tracker)
+                commit('CURRENT_TRACKER', res.data.tracker)
             } catch(e) {
                 console.log(e)
             }
@@ -143,7 +144,8 @@ export default {
             const trackForm = {
                 startTime: payload.startTime,
                 endTime: payload.endTime,
-                total: payload.total
+                total: payload.total,
+                flag: payload.flag
             }
 
             try {

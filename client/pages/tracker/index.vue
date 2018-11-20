@@ -98,8 +98,10 @@ export default {
 
     mounted() {
         console.log('MOUNTED')
+        this.trackerList
         this.startTime = localStorage.getItem('Initial Time')
         this.setInitialTime
+        this.running
         this.$store.dispatch('getProject')
         setTimeout(() => {
             this.$store.dispatch('getTrackerData')
@@ -140,7 +142,8 @@ export default {
                     projClient: this.formData.project,
                     startTime: starting,
                     endTime: this.duration.end,
-                    total: this.duration.total
+                    total: this.duration.total,
+                    flag: false
                 })
             }
             // if (this.startTime === '' || this.startTime === undefined) {
@@ -191,31 +194,36 @@ export default {
         },
 
         stopper() {
-            console.log('TIMER STOPPED')
-            const startValue = moment(this.getInitialTime, "hh:mm:ss A").format("HH:mm:ss")
-            const ticking = this.counter.hrs + '' + this.counter.mins + '' + this.counter.sec  // Connects the hr, min and sec counter values (eg: 01:23:45 => 012345)
-            const timerValue = moment(ticking, "hmmss").format("HH:mm:ss")  // Converts the connected timer value into time format
-            const timeDuration = [startValue, timerValue]
-            const totalTime = timeDuration.slice(1).reduce((prev, cur) => moment.duration(cur).add(prev), moment.duration(timeDuration[0]))  // Adds the start time (tick) and counter value (timerValue)
-            this.duration.total = timerValue
-            this.duration.start = moment.utc(this.getInitialTime, "hh:mm:ss A").format("hh:mm:ss A")
-            this.duration.end = moment.utc(totalTime.asMilliseconds()).format("hh:mm:ss A")
-            this.$store.dispatch('stopTimer', { hrs: 0, mins: '0'+0, sec: '0'+0 })
-            this.$store.dispatch('setInitialTime', '')
-            this.counter.hrs = this.timerStopped.hrs
-            this.counter.mins = this.timerStopped.mins
-            this.counter.sec = this.timerStopped.sec
-
-            // console.log('SET: ', )
-            if (this.getInitialTime === '' || !this.running) {
-                this.$store.dispatch('trackerFinalData', {
-                    startTime: this.duration.start,
-                    endTime: this.duration.end,
-                    total: this.duration.total
-                })
-                this.trackerList
+            if (this.running === false) {
+                console.log('TIMER STOPPED')
+                const startValue = moment(this.getInitialTime, "hh:mm:ss A").format("HH:mm:ss")
+                const ticking = this.counter.hrs + '' + this.counter.mins + '' + this.counter.sec  // Connects the hr, min and sec counter values (eg: 01:23:45 => 012345)
+                const timerValue = moment(ticking, "hmmss").format("HH:mm:ss")  // Converts the connected timer value into time format
+                const timeDuration = [startValue, timerValue]
+                const totalTime = timeDuration.slice(1).reduce((prev, cur) => moment.duration(cur).add(prev), moment.duration(timeDuration[0]))  // Adds the start time (tick) and counter value (timerValue)
+                this.duration.total = timerValue
+                this.duration.start = moment.utc(this.getInitialTime, "hh:mm:ss A").format("hh:mm:ss A")
+                this.duration.end = moment.utc(totalTime.asMilliseconds()).format("hh:mm:ss A")
+                this.$store.dispatch('stopTimer', { hrs: 0, mins: '0'+0, sec: '0'+0 })
+                this.$store.dispatch('setInitialTime', '')
+                this.counter.hrs = this.timerStopped.hrs
+                this.counter.mins = this.timerStopped.mins
+                this.counter.sec = this.timerStopped.sec
+    
+                // console.log('SET: ', )
+                if (this.getInitialTime === '') {
+                    this.$store.dispatch('trackerFinalData', {
+                        startTime: this.duration.start,
+                        endTime: this.duration.end,
+                        total: this.duration.total,
+                        flag: true
+                    })
+                }
                 this.$store.dispatch('currentTracker', '')
                 this.startTime = ''
+                setTimeout(() => {
+                    this.trackerList
+                }, 100)
             }
             // setTimeout(() => {
                 // this.$store.dispatch('getTrackerData')
@@ -281,7 +289,13 @@ export default {
 
         trackerList() {
             // this.$store.dispatch('getTrackerData')
-            return this.$store.getters.trackerList
+            const listing = []
+            const data = this.$store.getters.trackerList.forEach((item) => {
+                if (item.flag === true) {
+                    return listing.push(item)
+                }
+            })
+            return listing
         },
     }
 }
