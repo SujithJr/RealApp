@@ -56,24 +56,24 @@ export default {
         INITIAL_TIME (state, payload) {
             state.initialTime = payload
         },
-        SINGLE_TRACKER_DATA (state, payload) {
-            state.tracker.push(payload)
-        },
+        // SINGLE_TRACKER_DATA (state, payload) {
+        //     state.tracker.push(payload)
+        // },
         TRACKER_DATA_LIST (state, payload) {
             state.tracker = payload
         },
         TRACKER_DATA (state, payload) {
-            const data = state.tracker.find(track => { return track._id === payload._id })
-            if (data === undefined || data === '') {
-                // state.tracker.push(payload)
-                return
-            } else {
-                data.title = payload.title
-                data.projClient = payload.projClient
-                data.startTime = payload.startTime
-                data.endTime = payload.endTime
-                data.total = payload.total
-            }
+            // const data = state.tracker.find(track => { return track._id === payload._id })
+            // if (data === undefined || data === '') {
+                state.tracker.push(payload)
+            //     return
+            // } else {
+            //     data.title = payload.title
+            //     data.projClient = payload.projClient
+            //     data.startTime = payload.startTime
+            //     data.endTime = payload.endTime
+            //     data.total = payload.total
+            // }
         },
         CURRENT_TRACKER (state, payload) {
             state.currentTracker = payload
@@ -82,6 +82,8 @@ export default {
 
     actions: {
         startedTimer ({commit}, payload) {
+            const data = JSON.stringify(payload)
+            localStorage.setItem('Timer', data)
             commit('RUNNING_TIMER', payload)
         },
 
@@ -93,8 +95,14 @@ export default {
             commit('RUNNING_TIMER', payload)
         },
 
-        initialTime ({commit}, payload) {
+        setInitialTime ({commit}, payload) {
+            localStorage.setItem('Initial Time',payload)
             commit('INITIAL_TIME', payload)
+        },
+
+        getInitialTime ({commit}, payload) {
+            const data = localStorage.getItem('Initial Time')
+            commit('INITIAL_TIME', data)
         },
 
         currentTracker ({commit}, payload) {
@@ -112,7 +120,7 @@ export default {
             
             try {
                 const res = await axios.post(API_URL, trackForm)
-                commit('SINGLE_TRACKER_DATA', res.data.tracker)
+                // commit('SINGLE_TRACKER_DATA', res.data.tracker)
                 commit('CURRENT_TRACKER', res.data.tracker)
                 console.log(res.data.tracker)
             } catch(e) {

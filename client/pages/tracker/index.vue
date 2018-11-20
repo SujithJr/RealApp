@@ -98,10 +98,9 @@ export default {
 
     mounted() {
         console.log('MOUNTED')
-        this.initialTime
-        // this.currentTrackItem(this.$store.getters.currentTracker.startTime)
+        this.startTime = localStorage.getItem('Initial Time')
+        this.setInitialTime
         this.$store.dispatch('getProject')
-        // this.currentTrackItem
         setTimeout(() => {
             this.$store.dispatch('getTrackerData')
             this.started
@@ -131,15 +130,28 @@ export default {
         startTimer() {
             this.show = !this.show
             this.$store.dispatch('running', true)
+            if (this.startTime === '') {
+                const starter = moment().format("HH:mm:ss")
+                const starting = moment.utc(starter, "hh:mm:ss A").format("hh:mm:ss A")
+                console.log('New Start', this.starter)
+                this.$store.dispatch('setInitialTime', starting)
+                this.$store.dispatch('trackerData', {
+                    title: this.handsOn,
+                    projClient: this.formData.project,
+                    startTime: starting,
+                    endTime: this.duration.end,
+                    total: this.duration.total
+                })
+            }
             // if (this.startTime === '' || this.startTime === undefined) {
                 
             // } else {
-            //     this.startTime = this.initialTime
+            //     this.startTime = this.setInitialTimeTime
             //     console.log('INSIDE ELSE IF: ', this.startTime)
             //     console.log('Type inside ELSE: ', typeof this.startTime)
-            //     // this.$store.dispatch('initialTime', this.startTime)
+            //     // this.$store.dispatch('setInitialTimeTime', this.startTime)
             // }
-            // console.log('TIMER STARTED + START TIME: ', this.initialTime)
+            // console.log('TIMER STARTED + START TIME: ', this.setInitialTimeTime)
                 this.timerSet = setInterval(() => {
                     this.counter.sec = parseInt(this.counter.sec) + 1  // Increments 'seconds' counter in the timer by 1 on each interval
                     if (this.counter.sec < 10 || this.counter.sec === 0) {  // Adds a trialing zero to the 'seconds' counter if it is less than 10 (eg: 01)
@@ -161,16 +173,13 @@ export default {
                     }
                     this.$store.dispatch('startedTimer', { hrs: this.counter.hrs, mins: this.counter.mins, sec: this.counter.sec })
                 }, 1000);
-                this.startTime = moment().format("HH:mm:ss")
-                const starting = moment.utc(this.startTime, "hh:mm:ss A").format("hh:mm:ss A")
-                this.$store.dispatch('initialTime', starting)
-                this.$store.dispatch('trackerData', {
-                    title: this.handsOn,
-                    projClient: this.formData.project,
-                    startTime: starting,
-                    endTime: this.duration.end,
-                    total: this.duration.total
-                })
+                // this.$store.dispatch('trackerData', {
+                //     title: this.handsOn,
+                //     projClient: this.formData.project,
+                //     startTime: starting,
+                //     endTime: this.duration.end,
+                //     total: this.duration.total
+                // })
             // }
         },
 
@@ -183,32 +192,33 @@ export default {
 
         stopper() {
             console.log('TIMER STOPPED')
-            const startValue = moment(this.initialTime, "hh:mm:ss A").format("HH:mm:ss")
+            const startValue = moment(this.getInitialTime, "hh:mm:ss A").format("HH:mm:ss")
             const ticking = this.counter.hrs + '' + this.counter.mins + '' + this.counter.sec  // Connects the hr, min and sec counter values (eg: 01:23:45 => 012345)
             const timerValue = moment(ticking, "hmmss").format("HH:mm:ss")  // Converts the connected timer value into time format
             const timeDuration = [startValue, timerValue]
             const totalTime = timeDuration.slice(1).reduce((prev, cur) => moment.duration(cur).add(prev), moment.duration(timeDuration[0]))  // Adds the start time (tick) and counter value (timerValue)
             this.duration.total = timerValue
-            this.duration.start = moment.utc(this.initialTime, "hh:mm:ss A").format("hh:mm:ss A")
+            this.duration.start = moment.utc(this.getInitialTime, "hh:mm:ss A").format("hh:mm:ss A")
             this.duration.end = moment.utc(totalTime.asMilliseconds()).format("hh:mm:ss A")
             this.$store.dispatch('stopTimer', { hrs: 0, mins: '0'+0, sec: '0'+0 })
-            this.$store.dispatch('initialTime', '')
+            this.$store.dispatch('setInitialTime', '')
             this.counter.hrs = this.timerStopped.hrs
             this.counter.mins = this.timerStopped.mins
             this.counter.sec = this.timerStopped.sec
 
             // console.log('SET: ', )
-
-            this.$store.dispatch('trackerFinalData', {
-                startTime: this.duration.start,
-                endTime: this.duration.end,
-                total: this.duration.total
-            })
-            // setTimeout(() => {
-                // this.$store.dispatch('getTrackerData')
+            if (this.getInitialTime === '' || !this.running) {
+                this.$store.dispatch('trackerFinalData', {
+                    startTime: this.duration.start,
+                    endTime: this.duration.end,
+                    total: this.duration.total
+                })
                 this.trackerList
                 this.$store.dispatch('currentTracker', '')
                 this.startTime = ''
+            }
+            // setTimeout(() => {
+                // this.$store.dispatch('getTrackerData')
             // }, 100)
         },
         // currentTrackItem (startingTime) {
@@ -241,7 +251,7 @@ export default {
             }
         },
 
-        initialTime() {
+        getInitialTime() {
             const data = this.$store.getters.initialTime
             this.startTime = data
             console.log('INITIAL TIME: ', data)
