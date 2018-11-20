@@ -201,7 +201,8 @@ app.post('/tracker', async (req, res) => {
         projClient: req.body.projClient,
         startTime: req.body.startTime,
         endTime: req.body.endTime,
-        total: req.body.total
+        total: req.body.total,
+        flag: req.body.flag
     })
 
     try {
@@ -224,7 +225,7 @@ app.get('/tracker', async (req, res) => {
 
 app.patch('/tracker/:id', async (req, res) => {
     const id = req.params.id;
-    const body = _.pick(req.body, ['title', 'projClient', 'startTime', 'endTime', 'total']);
+    const body = _.pick(req.body, ['title', 'projClient', 'startTime', 'endTime', 'total', 'flag']);
 
     if (!ObjectID.isValid(id)) {
         return res.status(404).send();

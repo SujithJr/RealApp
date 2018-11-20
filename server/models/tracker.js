@@ -20,6 +20,10 @@ const Tracker = mongoose.model('Tracker', {
     total: {
         type: String,
         trim: true
+    },
+    flag: {
+        type: Boolean,
+        required: true
     }
 });
 
