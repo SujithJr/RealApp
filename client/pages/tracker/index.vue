@@ -3,8 +3,8 @@
         <v-layout>
             <v-flex xs12>
                 <div class="c-inputs-control">
-                    <div class="c-inputs">
-                        <v-card class="c-input-cards">
+                    <div class="c-inputs" style="background: #f5f5f5">
+                        <div class="c-input-cards">
                             <v-text-field
                                 v-model="handsOn"
                                 placeholder="Hands On..."
@@ -19,8 +19,8 @@
                                     <v-divider></v-divider>
                                 </slot>
                             </dropdown>
-                        </v-card>
-                        <v-card class="c-input-cards">
+                        </div>
+                        <div class="c-input-cards">
                             <v-select
                             v-model="formData.project"
                             :items="listProj"
@@ -31,31 +31,68 @@
                             color="yellow"
                             single-line
                             ></v-select>
-                        </v-card>
-                    </div>
-                    <v-card class="c-wrap hidden-sm-down">
-                        <div class="c-wrapper">
-                            <h2 class="c-timer">
-                                <div class="c-ticker">
-                                    <span id="hrs">{{ counter.hrs }}</span>:<span id="mins">{{ counter.mins }}</span>:<span id="sec">{{ counter.sec }}</span>
-                                </div>
-                                <div class="c-control">
-                                    <a href="#/" @click.prevent="startTimer" v-if="show"><v-icon>play_circle_filled</v-icon></a>
-                                    <a href="#/" @click.prevent="stop" v-if="!show"><v-icon>stop</v-icon></a>
-                                </div>
-                            </h2>
                         </div>
+                    </div>
+                    <v-card class="c-wrap hidden-sm-down" style="background: #f5f5f5">
+                        <h2 class="c-timer">
+                            <div class="c-ticker">
+                                <span id="hrs">{{ counter.hrs }}</span>:<span id="mins">{{ counter.mins }}</span>:<span id="sec">{{ counter.sec }}</span>
+                            </div>
+                            <div class="c-control">
+                                <a href="#/" @click.prevent="startTimer" v-if="show"><v-icon>play_circle_filled</v-icon></a>
+                                <a href="#/" @click.prevent="stop" v-if="!show"><v-icon>stop</v-icon></a>
+                            </div>
+                        </h2>
                     </v-card>
                 </div>
             </v-flex>
             </v-layout>
-            <v-layout>
+            <v-layout class="mt-4 pt-2">
                 <v-flex xs12>
-                    <v-card class="c-timer-hour" v-for="item in trackerList" :key="item._id">
-                        <p>{{ item.title }} - <span style="display: inline-block; color: #333"><strong><small>{{ item.projClient.toUpperCase() }}</small></strong></span></p>
-                        <p>{{ item.startTime }} - {{ item.endTime }}</p>
-                        <p>{{ item.total }}</p>
-                    </v-card>
+                <!-- <v-flex xs10 offset-xs1 md10 offset-md1 lg10 offset-lg1 > -->
+                    <!-- <v-expansion-panel popout class="py-4">
+                        <v-expansion-panel-content v-for="item in trackerList" :key="item._id"> -->
+                            <!-- <div slot="header" class="text-capitalize"><span style="display: inline-block; color: #333"><strong>{{ item.date }}</strong></span></div> -->
+                            <!-- <v-card>
+                                <v-card-text>
+                                    <p>{{ item.title }} - <span style="display: inline-block; color: #333"><strong><small>{{ item.projClient.toUpperCase() }}</small></strong></span></p>
+                                    <p>{{ item.startTime }} - {{ item.endTime }}</p>
+                                    <p>{{ item.total }}</p>
+                                </v-card-text>
+                            </v-card> -->
+                            <v-card v-for="tracker in dailyTrackersList" :key="tracker.index">
+                                <v-card-title class="capitalize font-weight-bold ">{{ tracker }}</v-card-title>
+                                <v-data-table :items="trackerList" hide-actions hide-headers>
+                                    <template slot="items" slot-scope="props">
+                                        <!-- <template v-for="data in props.item.dailyTrackers">
+                                            <tr :key="data.index"><td><span class="text-capitalize" style="display: inline-block; color: #333"><strong>{{ data }}</strong></span></td></tr>
+                                        </template> -->
+                                        <template v-if="tracker === props.item.date">
+                                            <tr @click="props.expanded = !props.expanded">
+                                                <td>{{ props.item.title }}</td>
+                                                <td><span style="display: inline-block; color: #333"><strong><small>{{ props.item.projClient.toUpperCase() }}</small></strong></span></td>
+                                                <td>{{ props.item.startTime }} - {{ props.item.endTime }}</td>
+                                                <td>{{ props.item.total }}</td>
+                                            </tr>
+                                        </template>
+                                        <!-- <template v-else>
+                                            <tr @click="props.expanded = !props.expanded">
+                                                <td>{{ props.item.title }}</td>
+                                                <td><span style="display: inline-block; color: #333"><strong><small>{{ props.item.projClient.toUpperCase() }}</small></strong></span></td>
+                                                <td>{{ props.item.startTime }} - {{ props.item.endTime }}</td>
+                                                <td>{{ props.item.total }}</td>
+                                            </tr>
+                                        </template> -->
+                                    </template>
+                                    <template slot="expand" slot-scope="props">
+                                        <v-card flat>
+                                            <v-card-text>Peek-a-boo!</v-card-text>
+                                        </v-card>
+                                    </template>
+                                </v-data-table>
+                            </v-card>
+                        <!-- </v-expansion-panel-content>
+                    </v-expansion-panel> -->
                 </v-flex>
         </v-layout>
     </div>
@@ -64,7 +101,9 @@
 <script>
 import dropdown from '@/components/trackerSubComponents/dropdown'
 import prefixZero from '@/filters/prefix-zero'
+import dateExact from '@/filters/momentCalendar'
 import moment from 'moment'
+import _ from 'lodash'
 import axios from 'axios'
 import * as Cookies from "js-cookie";
 
@@ -82,6 +121,7 @@ export default {
             visible: false,
             handsOn: '',
             startTime: '',
+            dailyTrackersList: [],
             zeroSec: '0',
             duration: {
                 start: '',
@@ -97,12 +137,13 @@ export default {
     },
 
     mounted() {
-        console.log('MOUNTED')
         this.trackerList
         this.startTime = localStorage.getItem('Initial Time')
         this.setInitialTime
         this.running
         this.$store.dispatch('getProject')
+        // const date = new Date()
+        // console.log('Date: ', moment().calendar(new Date()))
         setTimeout(() => {
             this.$store.dispatch('getTrackerData')
             this.started
@@ -135,7 +176,6 @@ export default {
             if (this.startTime === '') {
                 const starter = moment().format("HH:mm:ss")
                 const starting = moment.utc(starter, "hh:mm:ss A").format("hh:mm:ss A")
-                console.log('New Start', this.starter)
                 this.$store.dispatch('setInitialTime', starting)
                 this.$store.dispatch('trackerData', {
                     title: this.handsOn,
@@ -143,47 +183,32 @@ export default {
                     startTime: starting,
                     endTime: this.duration.end,
                     total: this.duration.total,
-                    flag: false
+                    flag: false,
+                    date: moment(new Date()).utcOffset(330).format(),
+                    // counter: this.$store.state.tracker.startedTimer
                 })
             }
-            // if (this.startTime === '' || this.startTime === undefined) {
-                
-            // } else {
-            //     this.startTime = this.setInitialTimeTime
-            //     console.log('INSIDE ELSE IF: ', this.startTime)
-            //     console.log('Type inside ELSE: ', typeof this.startTime)
-            //     // this.$store.dispatch('setInitialTimeTime', this.startTime)
-            // }
-            // console.log('TIMER STARTED + START TIME: ', this.setInitialTimeTime)
-                this.timerSet = setInterval(() => {
-                    this.counter.sec = parseInt(this.counter.sec) + 1  // Increments 'seconds' counter in the timer by 1 on each interval
-                    if (this.counter.sec < 10 || this.counter.sec === 0) {  // Adds a trialing zero to the 'seconds' counter if it is less than 10 (eg: 01)
-                        this.counter.sec = this.zeroSec + this.counter.sec
+            this.timerSet = setInterval(() => {
+                this.counter.sec = parseInt(this.counter.sec) + 1  // Increments 'seconds' counter in the timer by 1 on each interval
+                if (this.counter.sec < 10 || this.counter.sec === 0) {  // Adds a trialing zero to the 'seconds' counter if it is less than 10 (eg: 01)
+                    this.counter.sec = this.zeroSec + this.counter.sec
+                }
+                if (parseInt(this.counter.sec) >= 60) {
+                    this.counter.mins = parseInt(this.counter.mins) + 1
+                    if (this.counter.mins < 10 || this.counter.mins === 0) {
+                        this.counter.mins = this.zeroSec + this.counter.mins
                     }
-                    if (parseInt(this.counter.sec) >= 60) {
-                        this.counter.mins = parseInt(this.counter.mins) + 1
-                        if (this.counter.mins < 10 || this.counter.mins === 0) {
-                            this.counter.mins = this.zeroSec + this.counter.mins
-                        }
-                        this.counter.sec = this.zeroSec + 0
+                    this.counter.sec = this.zeroSec + 0
+                }
+                if (parseInt(this.counter.mins) >= 60) {
+                    this.counter.hrs = parseInt(this.counter.hrs) + 1
+                    if (this.counter.hrs < 10 || this.counter.hrs === 0) {
+                        this.counter.hrs = this.zeroSec + this.counter.hrs
                     }
-                    if (parseInt(this.counter.mins) >= 60) {
-                        this.counter.hrs = parseInt(this.counter.hrs) + 1
-                        if (this.counter.hrs < 10 || this.counter.hrs === 0) {
-                            this.counter.hrs = this.zeroSec + this.counter.hrs
-                        }
-                        this.counter.mins = this.zeroSec + 0
-                    }
-                    this.$store.dispatch('startedTimer', { hrs: this.counter.hrs, mins: this.counter.mins, sec: this.counter.sec })
-                }, 1000);
-                // this.$store.dispatch('trackerData', {
-                //     title: this.handsOn,
-                //     projClient: this.formData.project,
-                //     startTime: starting,
-                //     endTime: this.duration.end,
-                //     total: this.duration.total
-                // })
-            // }
+                    this.counter.mins = this.zeroSec + 0
+                }
+                this.$store.dispatch('startedTimer', { hrs: this.counter.hrs, mins: this.counter.mins, sec: this.counter.sec })
+            }, 1000);
         },
 
         stop() {
@@ -195,28 +220,32 @@ export default {
 
         stopper() {
             if (this.running === false) {
-                console.log('TIMER STOPPED')
                 const startValue = moment(this.getInitialTime, "hh:mm:ss A").format("HH:mm:ss")
+                
                 const ticking = this.counter.hrs + '' + this.counter.mins + '' + this.counter.sec  // Connects the hr, min and sec counter values (eg: 01:23:45 => 012345)
                 const timerValue = moment(ticking, "hmmss").format("HH:mm:ss")  // Converts the connected timer value into time format
+                
                 const timeDuration = [startValue, timerValue]
                 const totalTime = timeDuration.slice(1).reduce((prev, cur) => moment.duration(cur).add(prev), moment.duration(timeDuration[0]))  // Adds the start time (tick) and counter value (timerValue)
+                
                 this.duration.total = timerValue
                 this.duration.start = moment.utc(this.getInitialTime, "hh:mm:ss A").format("hh:mm:ss A")
                 this.duration.end = moment.utc(totalTime.asMilliseconds()).format("hh:mm:ss A")
+                
                 this.$store.dispatch('stopTimer', { hrs: 0, mins: '0'+0, sec: '0'+0 })
                 this.$store.dispatch('setInitialTime', '')
+                
                 this.counter.hrs = this.timerStopped.hrs
                 this.counter.mins = this.timerStopped.mins
                 this.counter.sec = this.timerStopped.sec
     
-                // console.log('SET: ', )
                 if (this.getInitialTime === '') {
                     this.$store.dispatch('trackerFinalData', {
                         startTime: this.duration.start,
                         endTime: this.duration.end,
                         total: this.duration.total,
-                        flag: true
+                        flag: true,
+                        // counter: this.$store.state.tracker.startedTimer
                     })
                 }
                 this.$store.dispatch('currentTracker', '')
@@ -225,19 +254,7 @@ export default {
                     this.trackerList
                 }, 100)
             }
-            // setTimeout(() => {
-                // this.$store.dispatch('getTrackerData')
-            // }, 100)
         },
-        // currentTrackItem (startingTime) {
-        //     console.log('FROM currentTrackItem: ', startingTime)
-        //     if (startingTime) {
-        //         this.startTime = startingTime
-        //         this.$store.dispatch('initialTime', startingTime)
-        //         this.$store.dispatch('getTrackerData')
-        //     }
-        //     // this.initialTime
-        // },
     },
 
     computed: {
@@ -250,11 +267,6 @@ export default {
                 this.counter.hrs = this.$store.state.tracker.startedTimer.hrs
                 this.counter.mins = this.$store.state.tracker.startedTimer.mins 
                 this.counter.sec = this.$store.state.tracker.startedTimer.sec
-                console.log('CHECKING: ', {
-                    hrs: this.$store.state.tracker.startedTimer.hrs,
-                    mins: this.$store.state.tracker.startedTimer.mins,
-                    sec: this.$store.state.tracker.startedTimer.sec
-                })
                 this.startTimer()
             }
         },
@@ -262,7 +274,6 @@ export default {
         getInitialTime() {
             const data = this.$store.getters.initialTime
             this.startTime = data
-            console.log('INITIAL TIME: ', data)
             return data
         },
         timerStopped() {
@@ -288,15 +299,41 @@ export default {
         },
 
         trackerList() {
-            // this.$store.dispatch('getTrackerData')
             const listing = []
+            const dateObject = []
             const data = this.$store.getters.trackerList.forEach((item) => {
                 if (item.flag === true) {
-                    return listing.push(item)
+                    dateObject.push(this.$options.filters.dateExact(item.date))
+                    return listing.push({
+                        title: item.title,
+                        projClient: item.projClient,
+                        startTime: item.startTime,
+                        endTime: item.endTime,
+                        total: item.total,
+                        flag: item.flag,
+                        date: this.$options.filters.dateExact(item.date)
+                        // dailyTrackers,
+                    })
                 }
             })
+            const dataTracker = _.uniq(dateObject)
+            this.dailyTrackersList = dataTracker
             return listing
         },
+        sample() {
+            // return moment(new Date()).format("ddd, MMM Do, h:mm:ss a")
+            return moment(new Date()).utcOffset(330).calendar(null, {
+                sameDay: '[Today] - Do MMM ',
+                nextDay: '[Tomorrow]',
+                nextWeek: 'DD/MM/YYYY',
+                lastDay: '[Yesterday] - Do MMM',
+                lastWeek: 'DD/MM/YYYY',
+                sameElse: 'DD/MM/YYYY'
+            })
+        },
+        sample2() {
+            return moment(new Date()).utcOffset(330).format()
+        }
     }
 }
 </script>
@@ -311,42 +348,25 @@ body {
     margin-left: 5.5rem;
 }
 .c-wrap {
-    /* min-height: 280px;
-    max-height: 300px;
-    height: 100%; */
     max-width: 400px;
     width: 100%;
-    border-radius: 20px 0 0 20px;
-    background: #333 !important;
+    /* background: #333 !important; */
     display: flex;
     align-items: center;
     justify-content: center;
-    /* border: 4px solid #d13739 !important; */
-    /* margin-left: -11rem; */
     position: relative;
-}
-.c-wrap::after {
-    content: '';
-    display: block;
-    position: absolute;
-    height: 100%;
+    /* min-width: 200px;
+    max-width: 380px; */
     width: 100%;
-    background: #333 !important;
-    right: -100%;
-}
-.c-wrapper {
-    position: relative;
-    width: 100%;
-    text-align: center;
-    /* margin-top: 2rem; */
 }
 .c-timer {
-    font-size: 5rem;
+    font-size: 4rem;
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: center;
     padding: 0 1rem;
-    color: rgb(255, 255, 255, 0.85);
+    color: #101535;
     width: 100%;
 }
 .c-timer a {
@@ -361,8 +381,9 @@ body {
     vertical-align: middle;
     background: brown;
     color: #fff;
-    font-size: 5rem;
+    font-size: 4rem;
     border-radius: 50%;
+    margin: 7px 0;
 }
 .c-timer-hour {
     display: flex;
@@ -388,10 +409,13 @@ body {
     height: 70px;
     line-height: 45px;
     text-align: center;
-    margin-left: 2rem;
+    margin-left: 0.5rem;
 }
 .c-inputs {
-    width: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
 }
 .c-inputs-control {
     display: flex;
@@ -401,7 +425,8 @@ body {
 }
 .c-input-cards {
     padding: 1.25rem;
-    max-width: 570px;
+    /* max-width: 570px; */
+    width: 100%;
 }
 .c-input-cards .v-text-field {
     padding-top: 0;
@@ -411,10 +436,10 @@ body {
     content: none !important;
 } */
 .c-input-cards input {
-    width: 420px;
+    /* width: 420px; */
 }
 .proj-card {
-    height: 150px;
+    /* height: 150px; */
     overflow-y: auto;
 }
 .v-text-field > .v-input__control > .v-input__slot::after,
@@ -428,20 +453,6 @@ body {
     position: absolute;
     z-index: 100;
     top: 80px;
-    width: auto;
-}
-/* .v-text-field {
-    padding: 0;
-    margin: 0;
-}
-.project-title {
-    max-width: 350px; 
     width: 100%;
-    color: #fff;
 }
-.v-text-field.v-text-field--solo .v-input__control {
-    padding: 0;
-    height: 32px;
-    min-height: auto;
-} */
 </style>

@@ -1,28 +1,28 @@
 <template>
-    <div>
-        <v-toolbar
+    <div style="box-shadow: 0px -2px 5px 2px #333">
+        <!-- <v-toolbar
         color="#101535"
       dark
       tabs
-    >
+    > -->
 
-      <v-toolbar-title>{{ zone }}</v-toolbar-title>
+      <!-- <v-toolbar-title>{{ zone }}</v-toolbar-title> -->
 
-      <v-spacer></v-spacer>
+      <!-- <v-spacer></v-spacer> -->
 
       <!-- <v-btn icon>
         <v-icon>search</v-icon>
       </v-btn> -->
 
-      <v-btn icon>
+      <!-- <v-btn icon>
         <v-icon>more_vert</v-icon>
-      </v-btn>
+      </v-btn> -->
 
       <v-tabs
         slot="extension"
         v-model="tab"
         grow
-        color="#101535"
+        light
       >
       <v-tabs-slider color="yellow"></v-tabs-slider>
         <v-tab

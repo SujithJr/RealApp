@@ -116,7 +116,9 @@ export default {
                 startTime: payload.startTime,
                 endTime: payload.endTime,
                 total: payload.total,
-                flag: payload.flag
+                flag: payload.flag,
+                date: payload.date,
+                // counter: payload.counter
             }
             
             try {
@@ -133,7 +135,6 @@ export default {
             
             try {
                 const res = await axios.get(API_URL)
-                // console.log('TRACKER_LIST: ',res.data.tracker)
                 commit('TRACKER_DATA_LIST', res.data.tracker)
             } catch(e) {
                 console.log(e)
@@ -145,7 +146,8 @@ export default {
                 startTime: payload.startTime,
                 endTime: payload.endTime,
                 total: payload.total,
-                flag: payload.flag
+                flag: payload.flag,
+                // counter: payload.counter
             }
 
             try {
