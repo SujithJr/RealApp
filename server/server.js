@@ -202,7 +202,9 @@ app.post('/tracker', async (req, res) => {
         startTime: req.body.startTime,
         endTime: req.body.endTime,
         total: req.body.total,
-        flag: req.body.flag
+        flag: req.body.flag,
+        date: req.body.date,
+        // counter: req.body.counter
     })
 
     try {
@@ -225,7 +227,7 @@ app.get('/tracker', async (req, res) => {
 
 app.patch('/tracker/:id', async (req, res) => {
     const id = req.params.id;
-    const body = _.pick(req.body, ['title', 'projClient', 'startTime', 'endTime', 'total', 'flag']);
+    const body = _.pick(req.body, ['startTime', 'endTime', 'total', 'flag']);
 
     if (!ObjectID.isValid(id)) {
         return res.status(404).send();

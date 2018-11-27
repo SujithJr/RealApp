@@ -24,6 +24,13 @@ const Tracker = mongoose.model('Tracker', {
     flag: {
         type: Boolean,
         required: true
+    },
+    date: {
+        type: Date,
+    },
+    counter: {
+        type: String,
+        trim: true
     }
 });
 
