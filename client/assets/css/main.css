@@ -26,7 +26,13 @@
 .page-enter, .page-leave-to {
   opacity: 0;
 }
-
+.like {
+    /* margin-top: 10px; */
+    display: inline-block;
+}
+/* .like .v-icon {
+    margin-top: 10px;
+} */
 @tailwind utilities;
 
 /**

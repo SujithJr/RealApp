@@ -33,7 +33,6 @@
             {{ item.title }}
         </v-tab>
       </v-tabs>
-    </v-toolbar>
     </div>    
 </template>
 

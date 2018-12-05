@@ -37,10 +37,10 @@
                     </v-card>
                 </v-dialog>
                 <v-card class="mt-4">
-                    <div class="c-search">
-                        <input single-line solo v-model="search" placeholder="Search...">
-                        <v-btn @click.prevent="searchData()" color="#101535" dark depressed large>SEARCH</v-btn>
-                    </div>
+                    <form class="c-search" @submit.prevent="searchItem()">
+                        <input single-line solo ref="inputSearch" placeholder="Search...">
+                        <v-btn type="submit" color="#101535" dark depressed large>SEARCH</v-btn>
+                    </form>
                 </v-card>
                 <v-data-table
                     :headers="headers"
@@ -129,12 +129,17 @@ export default {
         },
         projects () {
             return this.getProjects.filter((project) => {
-                    return project.name.match(this.search) || project.client.match(this.search)
+                    return project.name.toLowerCase().match(this.search.toLowerCase()) || project.client.toLowerCase().match(this.search.toLowerCase())
             })
         } 
     },
 
     methods: {
+        searchItem () {
+            this.search = this.$refs.inputSearch.value
+            this.projects
+        },
+
         createProject () {
             this.dialog = true
             this.getClients

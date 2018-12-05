@@ -1,100 +1,105 @@
 <template>
     <div>
-        <v-layout>
-            <v-flex xs12>
-                <div class="c-inputs-control">
-                    <div class="c-inputs" style="background: #f5f5f5">
-                        <div class="c-input-cards">
-                            <v-text-field
-                                v-model="handsOn"
-                                placeholder="Hands On..."
-                                solo
-                                class="content"
-                                hide-details
-                            >
-                            </v-text-field>
-                            <dropdown v-if="visible" class="white elevation-2 px-4 dropdown" :projects="projects">
-                                <slot name="list" v-for="item in projects">
-                                    <a @click.prevent="option(item)" flat class="py-3 block" :key="item.index">{{item.name}} - <small><strong>{{item.client.toUpperCase() }}</strong></small></a>
-                                    <v-divider></v-divider>
-                                </slot>
-                            </dropdown>
-                        </div>
-                        <div class="c-input-cards">
-                            <v-select
-                            v-model="formData.project"
-                            :items="listProj"
-                            placeholder="Project..."
-                            solo
-                            hide-details
-                            small-chips
-                            color="yellow"
-                            single-line
-                            ></v-select>
-                        </div>
-                    </div>
-                    <v-card class="c-wrap hidden-sm-down" style="background: #f5f5f5">
-                        <h2 class="c-timer">
-                            <div class="c-ticker">
-                                <span id="hrs">{{ counter.hrs }}</span>:<span id="mins">{{ counter.mins }}</span>:<span id="sec">{{ counter.sec }}</span>
-                            </div>
-                            <div class="c-control">
-                                <a href="#/" @click.prevent="startTimer" v-if="show"><v-icon>play_circle_filled</v-icon></a>
-                                <a href="#/" @click.prevent="stop" v-if="!show"><v-icon>stop</v-icon></a>
-                            </div>
-                        </h2>
-                    </v-card>
-                </div>
-            </v-flex>
-            </v-layout>
-            <v-layout class="mt-4 pt-2">
+        <v-container>
+            <v-layout>
                 <v-flex xs12>
-                <!-- <v-flex xs10 offset-xs1 md10 offset-md1 lg10 offset-lg1 > -->
-                    <!-- <v-expansion-panel popout class="py-4">
-                        <v-expansion-panel-content v-for="item in trackerList" :key="item._id"> -->
-                            <!-- <div slot="header" class="text-capitalize"><span style="display: inline-block; color: #333"><strong>{{ item.date }}</strong></span></div> -->
-                            <!-- <v-card>
-                                <v-card-text>
-                                    <p>{{ item.title }} - <span style="display: inline-block; color: #333"><strong><small>{{ item.projClient.toUpperCase() }}</small></strong></span></p>
-                                    <p>{{ item.startTime }} - {{ item.endTime }}</p>
-                                    <p>{{ item.total }}</p>
-                                </v-card-text>
-                            </v-card> -->
-                            <v-card v-for="tracker in dailyTrackersList" :key="tracker.index">
-                                <v-card-title class="capitalize font-weight-bold ">{{ tracker }}</v-card-title>
-                                <v-data-table :items="trackerList" hide-actions hide-headers>
-                                    <template slot="items" slot-scope="props">
-                                        <!-- <template v-for="data in props.item.dailyTrackers">
-                                            <tr :key="data.index"><td><span class="text-capitalize" style="display: inline-block; color: #333"><strong>{{ data }}</strong></span></td></tr>
-                                        </template> -->
-                                        <template v-if="tracker === props.item.date">
-                                            <tr @click="props.expanded = !props.expanded">
-                                                <td>{{ props.item.title }}</td>
-                                                <td><span style="display: inline-block; color: #333"><strong><small>{{ props.item.projClient.toUpperCase() }}</small></strong></span></td>
-                                                <td>{{ props.item.startTime }} - {{ props.item.endTime }}</td>
-                                                <td>{{ props.item.total }}</td>
-                                            </tr>
-                                        </template>
-                                        <!-- <template v-else>
-                                            <tr @click="props.expanded = !props.expanded">
-                                                <td>{{ props.item.title }}</td>
-                                                <td><span style="display: inline-block; color: #333"><strong><small>{{ props.item.projClient.toUpperCase() }}</small></strong></span></td>
-                                                <td>{{ props.item.startTime }} - {{ props.item.endTime }}</td>
-                                                <td>{{ props.item.total }}</td>
-                                            </tr>
-                                        </template> -->
-                                    </template>
-                                    <template slot="expand" slot-scope="props">
-                                        <v-card flat>
-                                            <v-card-text>Peek-a-boo!</v-card-text>
-                                        </v-card>
-                                    </template>
-                                </v-data-table>
-                            </v-card>
-                        <!-- </v-expansion-panel-content>
-                    </v-expansion-panel> -->
+                    <div class="c-inputs-control">
+                        <div class="c-inputs">
+                            <div class="c-input-cards">
+                                <v-text-field
+                                    v-model="handsOn"
+                                    placeholder="Hands On..."
+                                    solo
+                                    class="content"
+                                    hide-details
+                                >
+                                </v-text-field>
+                                <dropdown v-if="visible" class="white elevation-2 px-4 dropdown" :projects="filteredItems">
+                                    <slot name="list" v-for="item in filteredItems">
+                                        <a @click.prevent="option(item)" flat class="py-3 block" :key="item.index">{{item.title}} - <small><span class="red-darkest--text font-weight-bold">{{item.projClient.toUpperCase() }}</span></small></a>
+                                        <v-divider></v-divider>
+                                    </slot>
+                                </dropdown>
+                            </div>
+                            <div class="c-input-cards">
+                                <v-select
+                                v-model="formData.project"
+                                :items="listProj"
+                                placeholder="Project..."
+                                solo
+                                hide-details
+                                small-chips
+                                color="yellow"
+                                single-line
+                                ></v-select>
+                            </div>
+                        </div>
+                        <v-card flat class="c-wrap hidden-sm-down" style="background: #f0f0f0">
+                            <h2 class="c-timer">
+                                <div class="c-ticker">
+                                    <span id="hrs">{{ counter.hrs }}</span>:<span id="mins">{{ counter.mins }}</span>:<span id="sec">{{ counter.sec }}</span>
+                                </div>
+                                <div class="c-control">
+                                    <a href="#/" @click.prevent="startTimer" v-if="show"><v-icon>play_circle_filled</v-icon></a>
+                                    <a href="#/" @click.prevent="stop" v-if="!show"><v-icon>stop</v-icon></a>
+                                </div>
+                            </h2>
+                        </v-card>
+                    </div>
                 </v-flex>
-        </v-layout>
+                </v-layout>
+                <v-layout class="mt-4 pt-2">
+                    <v-flex xs12>
+                    <!-- <v-flex xs10 offset-xs1 md10 offset-md1 lg10 offset-lg1 > -->
+                        <!-- <v-expansion-panel popout class="py-4">
+                            <v-expansion-panel-content v-for="item in trackerList" :key="item._id"> -->
+                                <!-- <div slot="header" class="text-capitalize"><span style="display: inline-block; color: #333"><strong>{{ item.date }}</strong></span></div> -->
+                                <!-- <v-card>
+                                    <v-card-text>
+                                        <p>{{ item.title }} - <span style="display: inline-block; color: #333"><strong><small>{{ item.projClient.toUpperCase() }}</small></strong></span></p>
+                                        <p>{{ item.startTime }} - {{ item.endTime }}</p>
+                                        <p>{{ item.total }}</p>
+                                    </v-card-text>
+                                </v-card> -->
+                                <v-card class="mt-3" v-for="tracker in dailyTrackersList" :key="tracker.index">
+                                    <v-card-title class="capitalize font-weight-bold ">{{ tracker }}</v-card-title>
+                                    <v-divider></v-divider>
+                                    <v-data-table :items="trackerList" item-key="title" hide-actions hide-headers>
+                                        <template slot="items" slot-scope="props">
+                                            <!-- <template v-for="data in props.item.dailyTrackers">
+                                                <tr :key="data.index"><td><span class="text-capitalize" style="display: inline-block; color: #333"><strong>{{ data }}</strong></span></td></tr>
+                                            </template> -->
+                                            <template v-if="tracker === props.item.date">
+                                                <tr>
+                                                    <td class="text-xs-left">{{ props.item.title }}</td>
+                                                    <td class="text-xs-left"><span style="display: inline-block; color: #333"><strong><small>{{ props.item.projClient.toUpperCase() }}</small></strong></span></td>
+                                                    <td class="text-xs-right">{{ props.item.startTime }} - {{ props.item.endTime }}</td>
+                                                    <td class="text-xs-right">{{ props.item.total }}</td>
+                                                    <td class="text-xs-right"><a @click.prevent="resume(props.item)" class="like"><v-icon>play_arrow</v-icon></a></td>
+                                                </tr>
+                                            </template>
+                                            <!-- <template v-else>
+                                                <tr @click="props.expanded = !props.expanded">
+                                                    <td>{{ props.item.title }}</td>
+                                                    <td><span style="display: inline-block; color: #333"><strong><small>{{ props.item.projClient.toUpperCase() }}</small></strong></span></td>
+                                                    <td>{{ props.item.startTime }} - {{ props.item.endTime }}</td>
+                                                    <td>{{ props.item.total }}</td>
+                                                </tr>
+                                            </template> -->
+                                        </template>
+                                        <!-- <template slot="expand" slot-scope="props">
+                                            <v-card flat>
+                                                <v-card-text>Peek-a-boo!</v-card-text>
+                                            </v-card>
+                                        </template> -->
+                                    </v-data-table>
+                                </v-card>
+                            <!-- </v-expansion-panel-content>
+                        </v-expansion-panel> -->
+                    </v-flex>
+            </v-layout>
+            {{ sample }}
+        </v-container>
     </div>
 </template>
 
@@ -137,7 +142,6 @@ export default {
     },
 
     mounted() {
-        this.trackerList
         this.startTime = localStorage.getItem('Initial Time')
         this.setInitialTime
         this.running
@@ -147,6 +151,7 @@ export default {
         setTimeout(() => {
             this.$store.dispatch('getTrackerData')
             this.started
+            this.trackerList
         }, 100)
         this.getProjects
     },
@@ -159,11 +164,13 @@ export default {
 
     methods: {
         option(data) {
-            console.log('DROPING MENU: ', data)
+            console.log('DROPING MENU: ', data.title +'-'+ data.projClient)
+            this.handsOn = data.title
+            this.formData.project = data.projClient
         },
 
         contentDrop(data) {
-            if ( data === '' || !this.projects) {
+            if ( data === '' || !this.trackerList) {
                 this.visible = false
             } else {
                 this.visible = true
@@ -255,6 +262,13 @@ export default {
                 }, 100)
             }
         },
+
+        resume(e) {
+            // console.log('OOPS: ', e)
+            this.handsOn = e.title
+            this.formData.project = e.projClient
+            this.startTimer()
+        }
     },
 
     computed: {
@@ -310,30 +324,50 @@ export default {
                         startTime: item.startTime,
                         endTime: item.endTime,
                         total: item.total,
-                        flag: item.flag,
                         date: this.$options.filters.dateExact(item.date)
                         // dailyTrackers,
                     })
                 }
             })
             const dataTracker = _.uniq(dateObject)
-            this.dailyTrackersList = dataTracker
-            return listing
+            this.dailyTrackersList = dataTracker.sort().reverse()
+            return listing.sort().reverse()
         },
-        sample() {
-            // return moment(new Date()).format("ddd, MMM Do, h:mm:ss a")
-            return moment(new Date()).utcOffset(330).calendar(null, {
-                sameDay: '[Today] - Do MMM ',
-                nextDay: '[Tomorrow]',
-                nextWeek: 'DD/MM/YYYY',
-                lastDay: '[Yesterday] - Do MMM',
-                lastWeek: 'DD/MM/YYYY',
-                sameElse: 'DD/MM/YYYY'
+
+        filteredItems() {
+            return this.trackerList.filter((item) => {
+                    return item.title.toLowerCase().match(this.handsOn.toLowerCase()) || item.projClient.toLowerCase().match(this.handsOn.toLowerCase())
             })
         },
-        sample2() {
-            return moment(new Date()).utcOffset(330).format()
-        }
+
+        sample() {
+            // let data
+            // const arr = this.trackerList.map((item) => data = { title: item.title, projClient: item.projClient} ).filter((item, index, array) => console.log(item.title, array[index].title))
+            // const idea = arr.filter((item, index, array) => console.log('OMG: ', array[index]))
+            // return arr
+            let data
+            const time = moment(Date.now()).format("h:mm:ss")
+            // setInterval(() => {
+            //     data = Math.floor((time - moment().format("HH:mm:ss")) / 1000)
+            // }, 1000)
+                console.log("WHOOPY: ", moment.duration(time).seconds())
+            return data
+        },
+
+        // sample3() {
+        //     // return moment(new Date()).format("ddd, MMM Do, h:mm:ss a")
+        //     return moment(new Date()).utcOffset(330).calendar(null, {
+        //         sameDay: '[Today] - Do MMM ',
+        //         nextDay: '[Tomorrow]',
+        //         nextWeek: 'DD/MM/YYYY',
+        //         lastDay: '[Yesterday] - Do MMM',
+        //         lastWeek: 'DD/MM/YYYY',
+        //         sameElse: 'DD/MM/YYYY'
+        //     })
+        // },
+        // sample2() {
+        //     return moment(new Date()).utcOffset(330).format()
+        // }
     }
 }
 </script>
@@ -355,6 +389,7 @@ body {
     align-items: center;
     justify-content: center;
     position: relative;
+    border-radius: 5px;
     /* min-width: 200px;
     max-width: 380px; */
     width: 100%;
@@ -426,6 +461,7 @@ body {
 .c-input-cards {
     padding: 1.25rem;
     /* max-width: 570px; */
+    position: relative;
     width: 100%;
 }
 .c-input-cards .v-text-field {
@@ -452,7 +488,10 @@ body {
 .dropdown {
     position: absolute;
     z-index: 100;
-    top: 80px;
-    width: 100%;
+    top: 75px;
+    width: auto;
+}
+.dropdown a {
+    color: #880E4F;
 }
 </style>
