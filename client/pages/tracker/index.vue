@@ -37,7 +37,8 @@
                         <v-card flat class="c-wrap hidden-sm-down" style="background: #f0f0f0">
                             <h2 class="c-timer">
                                 <div class="c-ticker">
-                                    <span id="hrs">{{ counter.hrs }}</span>:<span id="mins">{{ counter.mins }}</span>:<span id="sec">{{ counter.sec }}</span>
+                                    <span>{{ formatTime }}</span>
+                                    <!-- <span id="hrs">{{ counter.hrs }}</span>:<span id="mins">{{ counter.mins }}</span>:<span id="sec">{{ counter.sec }}</span> -->
                                 </div>
                                 <div class="c-control">
                                     <a href="#/" @click.prevent="startTimer" v-if="show"><v-icon>play_circle_filled</v-icon></a>
@@ -48,6 +49,7 @@
                     </div>
                 </v-flex>
                 </v-layout>
+                <h1>StartTime: {{ startTime }}</h1>
                 <v-layout class="mt-4 pt-2">
                     <v-flex xs12>
                     <!-- <v-flex xs10 offset-xs1 md10 offset-md1 lg10 offset-lg1 > -->
@@ -125,6 +127,7 @@ export default {
             },
             visible: false,
             handsOn: '',
+            formatTime: '00:00:00',
             startTime: '',
             dailyTrackersList: [],
             zeroSec: '0',
@@ -180,10 +183,14 @@ export default {
         startTimer() {
             this.show = !this.show
             this.$store.dispatch('running', true)
-            if (this.startTime === '') {
-                const starter = moment().format("HH:mm:ss")
-                const starting = moment.utc(starter, "hh:mm:ss A").format("hh:mm:ss A")
-                this.$store.dispatch('setInitialTime', starting)
+            console.log('Start: ', this.startTime)
+            if (this.startTime === '' || this.startTime === null) {
+                
+                // const starter = moment().format("HH:mm:ss")
+                // const starting = moment.utc(starter, "hh:mm:ss A").format("hh:mm:ss A")
+                const starting = moment.utc().local().format('hh:mm:ss A')
+                this.startTime = moment().toDate().getTime()
+                this.$store.dispatch('setInitialTime', this.startTime)
                 this.$store.dispatch('trackerData', {
                     title: this.handsOn,
                     projClient: this.formData.project,
@@ -191,38 +198,44 @@ export default {
                     endTime: this.duration.end,
                     total: this.duration.total,
                     flag: false,
-                    date: moment(new Date()).utcOffset(330).format(),
+                    date: moment.utc(new Date()).local().format(),
                     // counter: this.$store.state.tracker.startedTimer
                 })
             }
+            let secondsDuration
             this.timerSet = setInterval(() => {
-                this.counter.sec = parseInt(this.counter.sec) + 1  // Increments 'seconds' counter in the timer by 1 on each interval
-                if (this.counter.sec < 10 || this.counter.sec === 0) {  // Adds a trialing zero to the 'seconds' counter if it is less than 10 (eg: 01)
-                    this.counter.sec = this.zeroSec + this.counter.sec
-                }
-                if (parseInt(this.counter.sec) >= 60) {
-                    this.counter.mins = parseInt(this.counter.mins) + 1
-                    if (this.counter.mins < 10 || this.counter.mins === 0) {
-                        this.counter.mins = this.zeroSec + this.counter.mins
-                    }
-                    this.counter.sec = this.zeroSec + 0
-                }
-                if (parseInt(this.counter.mins) >= 60) {
-                    this.counter.hrs = parseInt(this.counter.hrs) + 1
-                    if (this.counter.hrs < 10 || this.counter.hrs === 0) {
-                        this.counter.hrs = this.zeroSec + this.counter.hrs
-                    }
-                    this.counter.mins = this.zeroSec + 0
-                }
-                this.$store.dispatch('startedTimer', { hrs: this.counter.hrs, mins: this.counter.mins, sec: this.counter.sec })
+                secondsDuration = Math.floor((moment().toDate().getTime() - this.startTime) / 1000)
+                this.formatTime = Math.floor(this.padString(moment.duration(secondsDuration, 'seconds').get('hours'))) +':'+ Math.floor(this.padString(moment.duration(secondsDuration, 'seconds').get('minutes'))) +':'+ Math.floor(this.padString(moment.duration(secondsDuration, 'seconds').get('seconds')))
+                // this.counter.sec = parseInt(this.counter.sec) + 1  // Increments 'seconds' counter in the timer by 1 on each interval
+                // if (this.counter.sec < 10 || this.counter.sec === 0) {  // Adds a trialing zero to the 'seconds' counter if it is less than 10 (eg: 01)
+                //     this.counter.sec = this.zeroSec + this.counter.sec
+                // }
+                // if (parseInt(this.counter.sec) >= 60) {
+                //     this.counter.mins = parseInt(this.counter.mins) + 1
+                //     if (this.counter.mins < 10 || this.counter.mins === 0) {
+                //         this.counter.mins = this.zeroSec + this.counter.mins
+                //     }
+                //     this.counter.sec = this.zeroSec + 0
+                // }
+                // if (parseInt(this.counter.mins) >= 60) {
+                //     this.counter.hrs = parseInt(this.counter.hrs) + 1
+                //     if (this.counter.hrs < 10 || this.counter.hrs === 0) {
+                //         this.counter.hrs = this.zeroSec + this.counter.hrs
+                //     }
+                //     this.counter.mins = this.zeroSec + 0
+                // }
+
+                // this.$store.dispatch('startedTimer', { hrs: this.counter.hrs, mins: this.counter.mins, sec: this.counter.sec })
+                this.$store.dispatch('startedTimer', this.formatTime)
             }, 1000);
         },
 
         stop() {
             this.show = !this.show
             this.$store.dispatch('running', false)
+            this.$store.dispatch('setInitialTime', '')
             clearInterval(this.timerSet)
-            this.stopper()
+            // this.stopper()
         },
 
         stopper() {
@@ -261,6 +274,10 @@ export default {
                     this.trackerList
                 }, 100)
             }
+        },
+
+        padString(data) {
+            return _.padStart(data, 2, 0)
         },
 
         resume(e) {
@@ -345,13 +362,37 @@ export default {
             // const arr = this.trackerList.map((item) => data = { title: item.title, projClient: item.projClient} ).filter((item, index, array) => console.log(item.title, array[index].title))
             // const idea = arr.filter((item, index, array) => console.log('OMG: ', array[index]))
             // return arr
-            let data
-            const time = moment(Date.now()).format("h:mm:ss")
+            // let data = moment('0:00:25', 'h:mm:ss').format('h:mm:ss')
+            const data = moment().toDate().getTime()
+            // const time = Date.now()
+            let time
+            let times = 0
             // setInterval(() => {
-            //     data = Math.floor((time - moment().format("HH:mm:ss")) / 1000)
+            //     // times = moment.duration(time.diff(data)).seconds()
+            //     times = Math.floor((Date.now() - data) / 1000)
+            //     console.log(times)
+            // }, 1000) 
+            // setInterval(() => {
+            //     times = Math.floor((moment().toDate().getTime() - data) / 1000)
+            //     // times = moment.duration(time.diff(data))
+            //     // console.log("WHOOPY: ", moment(data.toString(), 'ss').format('h:mm:ss'))
+            //     console.log('Humm: ', Math.floor(moment.duration(times, 'seconds').get('hours')) +':'+ Math.floor(moment.duration(times, 'seconds').get('minutes')) +':'+ Math.floor(moment.duration(times, 'seconds').get('seconds')))
             // }, 1000)
-                console.log("WHOOPY: ", moment.duration(time).seconds())
-            return data
+            // return moment.utc(time).local().format('h:mm:ss') + '-' + Date.now()
+            // console.log('Whoop: ', moment.duration(data)._milliseconds)
+            // return moment('00045', 'h:mm:ss').format('h:mm:ss')
+            // return times.get('hours') +':'+ times.get('minutes') +':'+ times.get('seconds')
+            // console.log('Wait: ', moment.duration(861837353).get('hours'))
+            // return moment.duration('25').get('seconds')
+            // return _.padStart(times.get('hours'), 2, 0) +':'+ _.padStart(times.get('minutes'), 2, 0) +':'+ _.padStart(times.get('seconds'), 2, 0)
+            // return moment().toDate().getTime()
+            let num = 3660
+            const shoot = moment.duration(34, 'minutes')
+            num = parseInt(num)
+            // return Math.floor(moment.duration(num, 'seconds').get('hours')) +':'+ Math.floor(moment.duration(num, 'seconds').get('minutes')) +':'+ Math.floor(moment.duration(num, 'seconds').get('seconds'))
+            // return Math.floor(moment.duration(num, 'seconds').asMinutes())
+            // return moment.utc().local().format('h:mm:ss A')
+            return moment.utc(new Date()).local().format()
         },
 
         // sample3() {
