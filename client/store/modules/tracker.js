@@ -143,7 +143,6 @@ export default {
 
         async trackerFinalData ({commit, getters}, payload) {
             const trackForm = {
-                startTime: payload.startTime,
                 endTime: payload.endTime,
                 total: payload.total,
                 flag: payload.flag,

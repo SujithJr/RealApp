@@ -49,17 +49,17 @@ export function createRouter() {
                 }
             },
             {
-                path: '/tracker/project',
-                component: Project,
-                name: 'Project',
+                path: '/tracker/clients',
+                component: Clients,
+                name: 'Clients',
                 meta: {
                     zone: 'Tracker'
                 }
             },
             {
-                path: '/tracker/clients',
-                component: Clients,
-                name: 'Clients',
+                path: '/tracker/project',
+                component: Project,
+                name: 'Project',
                 meta: {
                     zone: 'Tracker'
                 }

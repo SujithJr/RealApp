@@ -14,7 +14,7 @@
                                     hide-details
                                 >
                                 </v-text-field>
-                                <dropdown v-if="visible" class="white elevation-2 px-4 dropdown" :projects="filteredItems">
+                                <dropdown v-if="visible" ref="filteredList" class="white elevation-2 px-4 dropdown" :projects="filteredItems">
                                     <slot name="list" v-for="item in filteredItems">
                                         <a @click.prevent="option(item)" flat class="py-3 block" :key="item.index">{{item.title}} - <small><span class="red-darkest--text font-weight-bold">{{item.projClient.toUpperCase() }}</span></small></a>
                                         <v-divider></v-divider>
@@ -49,7 +49,6 @@
                     </div>
                 </v-flex>
                 </v-layout>
-                <h1>StartTime: {{ startTime }}</h1>
                 <v-layout class="mt-4 pt-2">
                     <v-flex xs12>
                     <!-- <v-flex xs10 offset-xs1 md10 offset-md1 lg10 offset-lg1 > -->
@@ -64,14 +63,14 @@
                                     </v-card-text>
                                 </v-card> -->
                                 <v-card class="mt-3" v-for="tracker in dailyTrackersList" :key="tracker.index">
-                                    <v-card-title class="capitalize font-weight-bold ">{{ tracker }}</v-card-title>
+                                    <v-card-title class="capitalize font-weight-bold ">{{ tracker._i }}</v-card-title>
                                     <v-divider></v-divider>
                                     <v-data-table :items="trackerList" item-key="title" hide-actions hide-headers>
                                         <template slot="items" slot-scope="props">
                                             <!-- <template v-for="data in props.item.dailyTrackers">
                                                 <tr :key="data.index"><td><span class="text-capitalize" style="display: inline-block; color: #333"><strong>{{ data }}</strong></span></td></tr>
                                             </template> -->
-                                            <template v-if="tracker === props.item.date">
+                                            <template v-if="tracker._i === props.item.date">
                                                 <tr>
                                                     <td class="text-xs-left">{{ props.item.title }}</td>
                                                     <td class="text-xs-left"><span style="display: inline-block; color: #333"><strong><small>{{ props.item.projClient.toUpperCase() }}</small></strong></span></td>
@@ -100,7 +99,6 @@
                         </v-expansion-panel> -->
                     </v-flex>
             </v-layout>
-            {{ sample }}
         </v-container>
     </div>
 </template>
@@ -120,22 +118,13 @@ export default {
     },
     data() {
         return {
-            counter: {
-                hrs: 0,
-                mins: '0' + 0,
-                sec: '0' + 0,
-            },
             visible: false,
             handsOn: '',
             formatTime: '00:00:00',
             startTime: '',
+            endTime: '',
+            total: '',
             dailyTrackersList: [],
-            zeroSec: '0',
-            duration: {
-                start: '',
-                end: '',
-                total: '',
-            },
             formData: {
                 project: '',
             },
@@ -145,18 +134,21 @@ export default {
     },
 
     mounted() {
+        document.addEventListener('click', this.documentClick)
         this.startTime = localStorage.getItem('Initial Time')
         this.setInitialTime
         this.running
         this.$store.dispatch('getProject')
-        // const date = new Date()
-        // console.log('Date: ', moment().calendar(new Date()))
         setTimeout(() => {
             this.$store.dispatch('getTrackerData')
             this.started
             this.trackerList
         }, 100)
         this.getProjects
+    },
+
+    destroyed () {
+        document.removeEventListener('click', this.documentClick)
     },
 
     watch: {
@@ -167,7 +159,6 @@ export default {
 
     methods: {
         option(data) {
-            console.log('DROPING MENU: ', data.title +'-'+ data.projClient)
             this.handsOn = data.title
             this.formData.project = data.projClient
         },
@@ -180,108 +171,71 @@ export default {
             }
         },
 
+        documentClick(e) {
+            let element = this.$refs.filteredList
+            let target = e.target
+            if (element !== target) {
+                this.visible = false
+            }
+        },
+
         startTimer() {
             this.show = !this.show
             this.$store.dispatch('running', true)
             console.log('Start: ', this.startTime)
             if (this.startTime === '' || this.startTime === null) {
-                
-                // const starter = moment().format("HH:mm:ss")
-                // const starting = moment.utc(starter, "hh:mm:ss A").format("hh:mm:ss A")
-                const starting = moment.utc().local().format('hh:mm:ss A')
                 this.startTime = moment().toDate().getTime()
                 this.$store.dispatch('setInitialTime', this.startTime)
                 this.$store.dispatch('trackerData', {
                     title: this.handsOn,
                     projClient: this.formData.project,
-                    startTime: starting,
-                    endTime: this.duration.end,
-                    total: this.duration.total,
+                    startTime: moment.utc().local().format('hh:mm:ss A'),
+                    endTime: this.endTime,
+                    total: this.total,
                     flag: false,
                     date: moment.utc(new Date()).local().format(),
-                    // counter: this.$store.state.tracker.startedTimer
                 })
             }
+            let ending = moment().toDate().getTime() 
             let secondsDuration
             this.timerSet = setInterval(() => {
                 secondsDuration = Math.floor((moment().toDate().getTime() - this.startTime) / 1000)
-                this.formatTime = Math.floor(this.padString(moment.duration(secondsDuration, 'seconds').get('hours'))) +':'+ Math.floor(this.padString(moment.duration(secondsDuration, 'seconds').get('minutes'))) +':'+ Math.floor(this.padString(moment.duration(secondsDuration, 'seconds').get('seconds')))
-                // this.counter.sec = parseInt(this.counter.sec) + 1  // Increments 'seconds' counter in the timer by 1 on each interval
-                // if (this.counter.sec < 10 || this.counter.sec === 0) {  // Adds a trialing zero to the 'seconds' counter if it is less than 10 (eg: 01)
-                //     this.counter.sec = this.zeroSec + this.counter.sec
-                // }
-                // if (parseInt(this.counter.sec) >= 60) {
-                //     this.counter.mins = parseInt(this.counter.mins) + 1
-                //     if (this.counter.mins < 10 || this.counter.mins === 0) {
-                //         this.counter.mins = this.zeroSec + this.counter.mins
-                //     }
-                //     this.counter.sec = this.zeroSec + 0
-                // }
-                // if (parseInt(this.counter.mins) >= 60) {
-                //     this.counter.hrs = parseInt(this.counter.hrs) + 1
-                //     if (this.counter.hrs < 10 || this.counter.hrs === 0) {
-                //         this.counter.hrs = this.zeroSec + this.counter.hrs
-                //     }
-                //     this.counter.mins = this.zeroSec + 0
-                // }
-
-                // this.$store.dispatch('startedTimer', { hrs: this.counter.hrs, mins: this.counter.mins, sec: this.counter.sec })
+                this.formatTime = this.padString(moment.duration(secondsDuration, 'seconds').get('hours')) +':'+ this.padString(moment.duration(secondsDuration, 'seconds').get('minutes')) +':'+ this.padString(moment.duration(secondsDuration, 'seconds').get('seconds'))
                 this.$store.dispatch('startedTimer', this.formatTime)
             }, 1000);
         },
 
         stop() {
             this.show = !this.show
+            clearInterval(this.timerSet)
             this.$store.dispatch('running', false)
             this.$store.dispatch('setInitialTime', '')
-            clearInterval(this.timerSet)
-            // this.stopper()
+            this.stopper()
         },
 
         stopper() {
             if (this.running === false) {
-                const startValue = moment(this.getInitialTime, "hh:mm:ss A").format("HH:mm:ss")
-                
-                const ticking = this.counter.hrs + '' + this.counter.mins + '' + this.counter.sec  // Connects the hr, min and sec counter values (eg: 01:23:45 => 012345)
-                const timerValue = moment(ticking, "hmmss").format("HH:mm:ss")  // Converts the connected timer value into time format
-                
-                const timeDuration = [startValue, timerValue]
-                const totalTime = timeDuration.slice(1).reduce((prev, cur) => moment.duration(cur).add(prev), moment.duration(timeDuration[0]))  // Adds the start time (tick) and counter value (timerValue)
-                
-                this.duration.total = timerValue
-                this.duration.start = moment.utc(this.getInitialTime, "hh:mm:ss A").format("hh:mm:ss A")
-                this.duration.end = moment.utc(totalTime.asMilliseconds()).format("hh:mm:ss A")
-                
-                this.$store.dispatch('stopTimer', { hrs: 0, mins: '0'+0, sec: '0'+0 })
-                this.$store.dispatch('setInitialTime', '')
-                
-                this.counter.hrs = this.timerStopped.hrs
-                this.counter.mins = this.timerStopped.mins
-                this.counter.sec = this.timerStopped.sec
-    
                 if (this.getInitialTime === '') {
                     this.$store.dispatch('trackerFinalData', {
-                        startTime: this.duration.start,
-                        endTime: this.duration.end,
-                        total: this.duration.total,
+                        endTime: moment.utc().local().format('hh:mm:ss A'),
+                        total: this.formatTime,
                         flag: true,
-                        // counter: this.$store.state.tracker.startedTimer
                     })
                 }
                 this.$store.dispatch('currentTracker', '')
-                this.startTime = ''
+                this.$store.dispatch('stopTimer', '00:00:00')
                 setTimeout(() => {
                     this.trackerList
                 }, 100)
             }
         },
 
-        padString(data) {
+        padString: function(data) {
             return _.padStart(data, 2, 0)
         },
 
         resume(e) {
-            // console.log('OOPS: ', e)
+            console.log('OOPS: ', e)
             this.handsOn = e.title
             this.formData.project = e.projClient
             this.startTimer()
@@ -295,9 +249,7 @@ export default {
         
         started() {
             if (this.$store.getters.running === true) {
-                this.counter.hrs = this.$store.state.tracker.startedTimer.hrs
-                this.counter.mins = this.$store.state.tracker.startedTimer.mins 
-                this.counter.sec = this.$store.state.tracker.startedTimer.sec
+                this.formatTime = this.$store.state.startedTimer
                 this.startTimer()
             }
         },
@@ -308,7 +260,8 @@ export default {
             return data
         },
         timerStopped() {
-            return this.$store.state.tracker.startedTimer
+            this.formatTime = this.$store.state.startedTimer
+            return this.formatTime
         },
 
         getProjects() {
@@ -342,12 +295,16 @@ export default {
                         endTime: item.endTime,
                         total: item.total,
                         date: this.$options.filters.dateExact(item.date)
-                        // dailyTrackers,
                     })
                 }
             })
-            const dataTracker = _.uniq(dateObject)
-            this.dailyTrackersList = dataTracker.sort().reverse()
+            let exactList = []
+            const arr = dateObject.map(item => moment(item))
+            let maxDate = arr.forEach((item) => {
+                return exactList.push(moment.max(item))
+            })
+            const dataTracker = _.uniqBy(exactList, '_i')
+            this.dailyTrackersList = dataTracker.reverse()
             return listing.sort().reverse()
         },
 
@@ -393,22 +350,9 @@ export default {
             // return Math.floor(moment.duration(num, 'seconds').asMinutes())
             // return moment.utc().local().format('h:mm:ss A')
             return moment.utc(new Date()).local().format()
+            // let secondsDuration = Math.floor((moment().toDate().getTime() - this.startTime) / 1000)
+            // return this.padString(moment.duration(secondsDuration, 'seconds').get('seconds'))
         },
-
-        // sample3() {
-        //     // return moment(new Date()).format("ddd, MMM Do, h:mm:ss a")
-        //     return moment(new Date()).utcOffset(330).calendar(null, {
-        //         sameDay: '[Today] - Do MMM ',
-        //         nextDay: '[Tomorrow]',
-        //         nextWeek: 'DD/MM/YYYY',
-        //         lastDay: '[Yesterday] - Do MMM',
-        //         lastWeek: 'DD/MM/YYYY',
-        //         sameElse: 'DD/MM/YYYY'
-        //     })
-        // },
-        // sample2() {
-        //     return moment(new Date()).utcOffset(330).format()
-        // }
     }
 }
 </script>
