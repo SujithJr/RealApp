@@ -227,7 +227,7 @@ app.get('/tracker', async (req, res) => {
 
 app.patch('/tracker/:id', async (req, res) => {
     const id = req.params.id;
-    const body = _.pick(req.body, ['startTime', 'endTime', 'total', 'flag']);
+    const body = _.pick(req.body, ['endTime', 'total', 'flag']);
 
     if (!ObjectID.isValid(id)) {
         return res.status(404).send();
