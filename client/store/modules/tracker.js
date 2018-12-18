@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:4000/tracker'
+const API_URL = 'http://localhost:4000/'
 
 import Vue from 'vue'
 import axios from 'axios'
@@ -122,7 +122,7 @@ export default {
             }
             
             try {
-                const res = await axios.post(API_URL, trackForm)
+                const res = await axios.post(API_URL + '/tracker', trackForm)
                 // commit('SINGLE_TRACKER_DATA', res.data.tracker)
                 console.log(res.data.tracker)
                 commit('CURRENT_TRACKER', res.data.tracker)
@@ -134,7 +134,7 @@ export default {
         async getTrackerData ({commit}, payload) {
             
             try {
-                const res = await axios.get(API_URL)
+                const res = await axios.get(API_URL + '/tracker')
                 commit('TRACKER_DATA_LIST', res.data.tracker)
             } catch(e) {
                 console.log(e)
@@ -151,14 +151,22 @@ export default {
 
             try {
                 console.log('CURRENT TRACKER: ', getters.currentTracker._id)
-                const res = await axios.patch(`${API_URL}/${getters.currentTracker._id}`, trackForm)
+                const res = await axios.patch(`${API_URL + '/tracker'}/${getters.currentTracker._id}`, trackForm)
                 console.log('PATCHED DATA: ', res.data.track)
                 commit('TRACKER_DATA', res.data.track)
                 // commit('')
             } catch(e) {
                 console.log(e)
             }
-        }
+        },
+
+        async durationProjList ({commit, getters}, payload) {
+            // try {
+            //     const res = await axios.patch()
+            // } catch(e) {
+            //     console.log(e)
+            // }
+        } 
     },
 
     getters: {

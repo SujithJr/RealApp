@@ -4,12 +4,13 @@
             <v-layout>
                 <v-flex xs12>
                     <div class="c-inputs-control">
-                        <div class="c-inputs">
+                        <div class="c-inputs elevation-4">
                             <div class="c-input-cards">
                                 <v-text-field
                                     v-model="handsOn"
                                     placeholder="Hands On..."
                                     solo
+                                    flat
                                     class="content"
                                     hide-details
                                 >
@@ -27,6 +28,7 @@
                                 :items="listProj"
                                 placeholder="Project..."
                                 solo
+                                flat
                                 hide-details
                                 small-chips
                                 color="yellow"
@@ -34,70 +36,36 @@
                                 ></v-select>
                             </div>
                         </div>
-                        <v-card flat class="c-wrap hidden-sm-down" style="background: #f0f0f0">
-                            <h2 class="c-timer">
-                                <div class="c-ticker">
-                                    <span>{{ formatTime }}</span>
-                                    <!-- <span id="hrs">{{ counter.hrs }}</span>:<span id="mins">{{ counter.mins }}</span>:<span id="sec">{{ counter.sec }}</span> -->
-                                </div>
-                                <div class="c-control">
-                                    <a href="#/" @click.prevent="startTimer" v-if="show"><v-icon>play_circle_filled</v-icon></a>
-                                    <a href="#/" @click.prevent="stop" v-if="!show"><v-icon>stop</v-icon></a>
-                                </div>
-                            </h2>
+                        <v-card flat class="c-wrap hidden-sm-down elevation-4" dark>
+                            <h2 class="c-timer">{{ formatTime }}</h2>
+                            <div class="c-control">
+                                <a href="#/" @click.prevent="startTimer" v-if="show"><v-icon>play_circle_filled</v-icon></a>
+                                <a href="#/" @click.prevent="stop" v-if="!show"><v-icon>stop</v-icon></a>
+                            </div>
                         </v-card>
                     </div>
                 </v-flex>
-                </v-layout>
-                <v-layout class="mt-4 pt-2">
-                    <v-flex xs12>
-                    <!-- <v-flex xs10 offset-xs1 md10 offset-md1 lg10 offset-lg1 > -->
-                        <!-- <v-expansion-panel popout class="py-4">
-                            <v-expansion-panel-content v-for="item in trackerList" :key="item._id"> -->
-                                <!-- <div slot="header" class="text-capitalize"><span style="display: inline-block; color: #333"><strong>{{ item.date }}</strong></span></div> -->
-                                <!-- <v-card>
-                                    <v-card-text>
-                                        <p>{{ item.title }} - <span style="display: inline-block; color: #333"><strong><small>{{ item.projClient.toUpperCase() }}</small></strong></span></p>
-                                        <p>{{ item.startTime }} - {{ item.endTime }}</p>
-                                        <p>{{ item.total }}</p>
-                                    </v-card-text>
-                                </v-card> -->
-                                <v-card class="mt-3" v-for="tracker in dailyTrackersList" :key="tracker.index">
-                                    <v-card-title class="capitalize font-weight-bold ">{{ tracker._i }}</v-card-title>
-                                    <v-divider></v-divider>
-                                    <v-data-table :items="trackerList" item-key="title" hide-actions hide-headers>
-                                        <template slot="items" slot-scope="props">
-                                            <!-- <template v-for="data in props.item.dailyTrackers">
-                                                <tr :key="data.index"><td><span class="text-capitalize" style="display: inline-block; color: #333"><strong>{{ data }}</strong></span></td></tr>
-                                            </template> -->
-                                            <template v-if="tracker._i === props.item.date">
-                                                <tr>
-                                                    <td class="text-xs-left">{{ props.item.title }}</td>
-                                                    <td class="text-xs-left"><span style="display: inline-block; color: #333"><strong><small>{{ props.item.projClient.toUpperCase() }}</small></strong></span></td>
-                                                    <td class="text-xs-right">{{ props.item.startTime }} - {{ props.item.endTime }}</td>
-                                                    <td class="text-xs-right">{{ props.item.total }}</td>
-                                                    <td class="text-xs-right"><a @click.prevent="resume(props.item)" class="like"><v-icon>play_arrow</v-icon></a></td>
-                                                </tr>
-                                            </template>
-                                            <!-- <template v-else>
-                                                <tr @click="props.expanded = !props.expanded">
-                                                    <td>{{ props.item.title }}</td>
-                                                    <td><span style="display: inline-block; color: #333"><strong><small>{{ props.item.projClient.toUpperCase() }}</small></strong></span></td>
-                                                    <td>{{ props.item.startTime }} - {{ props.item.endTime }}</td>
-                                                    <td>{{ props.item.total }}</td>
-                                                </tr>
-                                            </template> -->
-                                        </template>
-                                        <!-- <template slot="expand" slot-scope="props">
-                                            <v-card flat>
-                                                <v-card-text>Peek-a-boo!</v-card-text>
-                                            </v-card>
-                                        </template> -->
-                                    </v-data-table>
-                                </v-card>
-                            <!-- </v-expansion-panel-content>
-                        </v-expansion-panel> -->
-                    </v-flex>
+            </v-layout>
+            <v-layout class="mt-4 pt-2">
+                <v-flex xs12>
+                    <v-card class="mt-3" v-for="tracker in dailyTrackersList" :key="tracker.index">
+                        <v-card-title class="capitalize font-weight-bold ">{{ tracker }}</v-card-title>
+                        <v-divider></v-divider>
+                        <v-data-table :items="trackerList" item-key="title" hide-actions hide-headers>
+                            <template slot="items" slot-scope="props">
+                                <template v-if="tracker === props.item.date">
+                                    <tr>
+                                        <td class="text-xs-left">{{ props.item.title }}</td>
+                                        <td class="text-xs-left"><span style="display: inline-block; color: #333"><strong><small>{{ props.item.projClient.toUpperCase() }}</small></strong></span></td>
+                                        <td class="text-xs-right">{{ props.item.startTime }} - {{ props.item.endTime }}</td>
+                                        <td class="text-xs-right">{{ props.item.total }}</td>
+                                        <td class="text-xs-right"><a @click.prevent="resume(props.item)" class="like"><v-icon>play_arrow</v-icon></a></td>
+                                    </tr>
+                                </template>
+                            </template>
+                        </v-data-table>
+                    </v-card>
+                </v-flex>
             </v-layout>
         </v-container>
     </div>
@@ -107,6 +75,7 @@
 import dropdown from '@/components/trackerSubComponents/dropdown'
 import prefixZero from '@/filters/prefix-zero'
 import dateExact from '@/filters/momentCalendar'
+import momentCalc from '@/filters/momentFunctions'
 import moment from 'moment'
 import _ from 'lodash'
 import axios from 'axios'
@@ -182,18 +151,17 @@ export default {
         startTimer() {
             this.show = !this.show
             this.$store.dispatch('running', true)
-            console.log('Start: ', this.startTime)
             if (this.startTime === '' || this.startTime === null) {
                 this.startTime = moment().toDate().getTime()
                 this.$store.dispatch('setInitialTime', this.startTime)
                 this.$store.dispatch('trackerData', {
                     title: this.handsOn,
                     projClient: this.formData.project,
-                    startTime: moment.utc().local().format('hh:mm:ss A'),
+                    startTime: this.$options.filters.timeNow(),
                     endTime: this.endTime,
                     total: this.total,
                     flag: false,
-                    date: moment.utc(new Date()).local().format(),
+                    date: this.$options.filters.dateToday(),
                 })
             }
             let ending = moment().toDate().getTime() 
@@ -217,13 +185,17 @@ export default {
             if (this.running === false) {
                 if (this.getInitialTime === '') {
                     this.$store.dispatch('trackerFinalData', {
-                        endTime: moment.utc().local().format('hh:mm:ss A'),
+                        endTime: this.$options.filters.timeNow(),
                         total: this.formatTime,
                         flag: true,
                     })
+                    this.$store.dispatch('durationProjList', { total: this.formatTime })
                 }
                 this.$store.dispatch('currentTracker', '')
                 this.$store.dispatch('stopTimer', '00:00:00')
+                this.timerStopped
+                this.handsOn = ''
+                this.formData.project = ''
                 setTimeout(() => {
                     this.trackerList
                 }, 100)
@@ -235,7 +207,6 @@ export default {
         },
 
         resume(e) {
-            console.log('OOPS: ', e)
             this.handsOn = e.title
             this.formData.project = e.projClient
             this.startTimer()
@@ -260,7 +231,7 @@ export default {
             return data
         },
         timerStopped() {
-            this.formatTime = this.$store.state.startedTimer
+            this.formatTime = this.$store.state.tracker.startedTimer
             return this.formatTime
         },
 
@@ -273,12 +244,13 @@ export default {
             this.getProjects.forEach((item) => {
                 itemArr.push(item.name + ' - ' + item.client )
             })
+            console.log('Project list: ', itemArr)
             return itemArr
         },
 
         projects() {
             return this.getProjects.filter((project) => {
-                    return project.name.toLowerCase().match(this.handsOn) || project.client.toLowerCase().match(this.handsOn)
+                return project.name.toLowerCase().match(this.handsOn) || project.client.toLowerCase().match(this.handsOn)
             })
         },
 
@@ -299,59 +271,23 @@ export default {
                 }
             })
             let exactList = []
-            const arr = dateObject.map(item => moment(item))
-            let maxDate = arr.forEach((item) => {
+            // const arr = dateObject.map(item => moment(item))
+            // console.log('Hoosh: ', dateObject)
+            let maxDate = dateObject.forEach((item) => {
+                // console.log('Hoosh: ', moment.max(item))
                 return exactList.push(moment.max(item))
             })
-            const dataTracker = _.uniqBy(exactList, '_i')
+            // console.log('haaaaaaa: ', exactList)
+            const dataTracker = _.uniq(exactList)
+            // console.log('Yuppp: ', dataTracker)
             this.dailyTrackersList = dataTracker.reverse()
             return listing.sort().reverse()
         },
 
         filteredItems() {
             return this.trackerList.filter((item) => {
-                    return item.title.toLowerCase().match(this.handsOn.toLowerCase()) || item.projClient.toLowerCase().match(this.handsOn.toLowerCase())
+                return item.title.toLowerCase().match(this.handsOn.toLowerCase()) || item.projClient.toLowerCase().match(this.handsOn.toLowerCase())
             })
-        },
-
-        sample() {
-            // let data
-            // const arr = this.trackerList.map((item) => data = { title: item.title, projClient: item.projClient} ).filter((item, index, array) => console.log(item.title, array[index].title))
-            // const idea = arr.filter((item, index, array) => console.log('OMG: ', array[index]))
-            // return arr
-            // let data = moment('0:00:25', 'h:mm:ss').format('h:mm:ss')
-            const data = moment().toDate().getTime()
-            // const time = Date.now()
-            let time
-            let times = 0
-            // setInterval(() => {
-            //     // times = moment.duration(time.diff(data)).seconds()
-            //     times = Math.floor((Date.now() - data) / 1000)
-            //     console.log(times)
-            // }, 1000) 
-            // setInterval(() => {
-            //     times = Math.floor((moment().toDate().getTime() - data) / 1000)
-            //     // times = moment.duration(time.diff(data))
-            //     // console.log("WHOOPY: ", moment(data.toString(), 'ss').format('h:mm:ss'))
-            //     console.log('Humm: ', Math.floor(moment.duration(times, 'seconds').get('hours')) +':'+ Math.floor(moment.duration(times, 'seconds').get('minutes')) +':'+ Math.floor(moment.duration(times, 'seconds').get('seconds')))
-            // }, 1000)
-            // return moment.utc(time).local().format('h:mm:ss') + '-' + Date.now()
-            // console.log('Whoop: ', moment.duration(data)._milliseconds)
-            // return moment('00045', 'h:mm:ss').format('h:mm:ss')
-            // return times.get('hours') +':'+ times.get('minutes') +':'+ times.get('seconds')
-            // console.log('Wait: ', moment.duration(861837353).get('hours'))
-            // return moment.duration('25').get('seconds')
-            // return _.padStart(times.get('hours'), 2, 0) +':'+ _.padStart(times.get('minutes'), 2, 0) +':'+ _.padStart(times.get('seconds'), 2, 0)
-            // return moment().toDate().getTime()
-            let num = 3660
-            const shoot = moment.duration(34, 'minutes')
-            num = parseInt(num)
-            // return Math.floor(moment.duration(num, 'seconds').get('hours')) +':'+ Math.floor(moment.duration(num, 'seconds').get('minutes')) +':'+ Math.floor(moment.duration(num, 'seconds').get('seconds'))
-            // return Math.floor(moment.duration(num, 'seconds').asMinutes())
-            // return moment.utc().local().format('h:mm:ss A')
-            return moment.utc(new Date()).local().format()
-            // let secondsDuration = Math.floor((moment().toDate().getTime() - this.startTime) / 1000)
-            // return this.padString(moment.duration(secondsDuration, 'seconds').get('seconds'))
         },
     }
 }
@@ -367,56 +303,30 @@ body {
     margin-left: 5.5rem;
 }
 .c-wrap {
-    max-width: 400px;
-    width: 100%;
-    /* background: #333 !important; */
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    border-radius: 5px;
-    /* min-width: 200px;
-    max-width: 380px; */
-    width: 100%;
+    padding: 0.3rem 3rem;
+    background: #222;
 }
 .c-timer {
-    font-size: 4rem;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
+    font-size: 3rem;
     padding: 0 1rem;
-    color: #101535;
-    width: 100%;
-}
-.c-timer a {
-    text-decoration: none;
-    color: rgb(255, 255, 255, 0.85);
-    outline: 0;
-    width: 100%;
-    height: 100%;
-    display: inline-block;
-}
-.c-timer a .v-icon {
-    vertical-align: middle;
-    background: brown;
-    color: #fff;
-    font-size: 4rem;
-    border-radius: 50%;
-    margin: 7px 0;
+    /* color: #101535; */
+    color: rgba(255, 255, 255, 0.8);
+    height: 42px;
+    line-height: 42px;
 }
 .c-timer-hour {
     display: flex;
     justify-content: space-around;
     align-items: center;
     box-shadow: 1px 2px 5px 0px #ccc;
-    /* width: 90%; */
     padding: 1rem;
     font-weight: 800;
     margin: 0 auto;
-    /* margin-top: 2rem; */
     font-size: 1rem;
-    /* background: rgb(0,0,0,0.8); */
 }
 .c-timer-hour:first-child {
     margin-top: 2rem;
@@ -424,12 +334,20 @@ body {
 .c-timer-hour p {
     color: yellowgreen;
 }
-.c-control {
-    width: 70px;
-    height: 70px;
-    line-height: 45px;
-    text-align: center;
-    margin-left: 0.5rem;
+.c-control a {
+    text-decoration: none;
+    color: rgb(255, 255, 255, 0.85);
+    outline: 0;
+    width: 100%;
+    height: 100%;
+    display: inline-block;
+}
+.c-control a .v-icon {
+    vertical-align: middle;
+    background: brown;
+    color: #fff;
+    font-size: 3rem;
+    border-radius: 50%;
 }
 .c-inputs {
     display: flex;
@@ -444,8 +362,6 @@ body {
     margin-top: 3rem;
 }
 .c-input-cards {
-    padding: 1.25rem;
-    /* max-width: 570px; */
     position: relative;
     width: 100%;
 }
@@ -453,14 +369,7 @@ body {
     padding-top: 0;
     margin-top: 0;
 }
-/* .v-text-field > .v-input__control > .v-input__slot::after, .v-text-field > .v-input__control > .v-input__slot::before {
-    content: none !important;
-} */
-.c-input-cards input {
-    /* width: 420px; */
-}
 .proj-card {
-    /* height: 150px; */
     overflow-y: auto;
 }
 .v-text-field > .v-input__control > .v-input__slot::after,

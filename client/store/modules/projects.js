@@ -32,7 +32,13 @@ export default {
         async addProject ({ commit, dispatch}, data) {
             console.log(data.name)
             try {
-                const res = await axios.post(API_URL, { name: data.name, client: data.client })
+                const res = await axios.post(API_URL, { 
+                    name: data.name, 
+                    client: data.client,
+                    duration: data.duration,
+                    team: data.team,
+                    date: data.date 
+                })
                 console.log(res.data.project)
                 commit('ADD_PROJECT', res.data.project)
             } catch(e) {

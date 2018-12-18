@@ -24,6 +24,9 @@
                                             solo
                                         ></v-select>
                                     </v-flex>
+                                    <v-flex xs12 sm6 md6>
+                                        <v-text-field v-model="team"></v-text-field>
+                                    </v-flex>
                                 </v-layout>
                                 </v-container>
                             </v-card-text>
@@ -73,17 +76,25 @@
                         </v-alert>
                     </template>
                 </v-data-table>
+                <h3>{{ getTrackerList }}</h3>
             </v-flex>
         </v-layout>
     </v-container>
 </template>
 
 <script>
+import prefixZero from '@/filters/prefix-zero'
+import dateExact from '@/filters/momentCalendar'
+import moment from 'moment'
+import _ from 'lodash'
+import * as Cookies from "js-cookie";
+
 export default {
     data: () => ({
         dialog: false,
         name: '',
         client: '',
+        team: '',
         search: '',
         clientsName: [],
         headers: [
@@ -115,6 +126,7 @@ export default {
 
     mounted () {
         this.$store.dispatch('getProject')
+        this.$store.dispatch('getTrackerData')
     },
 
     computed: {
@@ -128,9 +140,35 @@ export default {
             return this.$store.getters.getProjects
         },
         projects () {
+            // const track = []
+            // const proj = []
+            // const final = []
+            // this.$store.getters.trackerList.forEach((item) => {
+            //     track.push({
+            //         item,
+            //         Title: _.startCase(item.projClient)
+            //     })
+            // })
+            // this.getProjects.forEach((item) => {
+            //     this.track.forEach((data) => {
+            //         let detail = item.name + ' '+ item.client
+            //         if (data.Title === detail) {
+                        
+            //         }
+            //     })
+            // })
             return this.getProjects.filter((project) => {
                     return project.name.toLowerCase().match(this.search.toLowerCase()) || project.client.toLowerCase().match(this.search.toLowerCase())
             })
+        },
+        getTrackerList() {
+            const track = []
+            const proj = []
+            this.$store.getters.trackerList.forEach((item) => {
+                item.total
+            })
+            console.log('Dura: ', moment.duration('00:00:34'))
+            return this.$store.getters.trackerList
         } 
     },
 
@@ -151,10 +189,14 @@ export default {
         save () {
             this.$store.dispatch('addProject', {
                 name: this.name,
-                client: this.client
+                client: this.client,
+                duration: '',
+                team: this.team,
+                date: this.$options.filters.dateToday()
             })
             this.name = ''
             this.client = ''
+            this.team = ''
             this.getProjects
             this.dialog = false
         },

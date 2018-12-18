@@ -7,7 +7,7 @@ const dateObj = function(value) {
         nextDay: '[Tomorrow]',
         nextWeek: 'DD/MM/YYYY',
         lastDay: '[Yesterday], D MMM \'YY',
-        lastWeek: 'DD/MM/YYYY',
+        lastWeek: 'ddd, D MMM \'YY',
         sameElse: 'ddd, D MMM \'YY'
     })
 }
