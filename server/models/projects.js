@@ -10,7 +10,17 @@ const Project = mongoose.model('Projects', {
     client: {
         type: String,
         trim: true
-    }
+    },
+    team: {
+        type: String,
+        trim: true
+    },
+    duration: {
+        type: String,
+    },
+    date: {
+        type: Date,
+    },
 });
 
 module.exports = {

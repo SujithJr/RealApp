@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const express = require('express');
+const socketIO = require('socket.io');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
@@ -171,7 +172,10 @@ app.patch('/clients/:id', async (req, res) => {
 app.post('/projects', async (req, res) => {
     const proj = new Project({
         name: req.body.name,
-        client: req.body.client
+        client: req.body.client,
+        duration: req.body.duration,
+        team: req.body.team,
+        date: req.body.date
     })
 
     try {
@@ -247,8 +251,11 @@ app.patch('/tracker/:id', async (req, res) => {
 
 const port = process.env.PORT || 4000;
 
-app.listen(port, () => {
-    console.log(`Started up at port ${port}`);
+const serve = app.listen(port);
+const io = socketIO(serve);
+// const server = http.createServer(app);
+io.on('connection', socket => {
+    console.log('New user Connected');
 });
 
 module.exports = {app}
