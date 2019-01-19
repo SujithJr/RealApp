@@ -1,19 +1,19 @@
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 
-const Client = mongoose.model('Clients', {
-    name: {
-        type: String,
-        required: true,
-        minlength: 1,
-        trim: true
-    },
-    color: {
-        type: String,
-        minlength: 1,
-        trim: true
-    }
-});
+// const Client = mongoose.model('Clients', {
+//     name: {
+//         type: String,
+//         required: true,
+//         minlength: 1,
+//         trim: true
+//     },
+//     color: {
+//         type: String,
+//         minlength: 1,
+//         trim: true
+//     }
+// });
 
-module.exports = {
-    Client
-};
+// module.exports = {
+//     Client
+// };
