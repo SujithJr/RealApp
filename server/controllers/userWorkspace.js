@@ -158,9 +158,7 @@ module.exports = {
             const doc = await UserWorkspace.findByIdAndDelete({ _id: req.body.userId, 'role': "Admin" });
             
             if (!doc) {
-                return res.status(404).send({
-                    message: 'Workspace Not Found'
-                });
+                return res.status(404).send({ message: 'Workspace Not Found' });
             }
 
             res.send({ doc });
@@ -218,75 +216,8 @@ module.exports = {
 
                 res.status(201).send({ message: 'Invitation Sent!' });
             }
-
-
-
-            // const userExist = await UserWorkspace.findOne({ email: req.body.email });
-            // if (userExist) {
-            //     // return res.status(409).send({
-            //     //     message: 'Mail-Id already exist, please try another'
-            //     // });
-            //     const filtered = userExist.otherWorkspace.filter(item => item.workspaceId == req.params.workspaceId);
-            //     if (filtered.length > 0) {
-            //         return res.status(201).send({ Message: 'User Already Exist. Invitation Sent!'})
-            //     } else {
-            //         const updateUser = await UserWorkspace.findByIdAndUpdate({ _id: userExist._id }, {
-            //         $push: { 
-            //             'otherWorkspace': { workspaceId: req.params.workspaceId } }
-            //     }, 
-            //     { new: true });
-
-            //     const updateTeam = await UserWorkspace.findByIdAndUpdate({ 
-            //             _id: req.params.workspaceId,
-            //             // 'workspace._id': ObjectId(req.params.workspaceId) 
-            //         }, { $push: { 'workspace.$.team': { member: userExist._id } } }, { new: true });
-            //     }
-            //     res.status(201).send({
-            //         updateTeam,
-            //         message: 'Invitation Sent!'
-            //     });
-            //     // { $and: [{ 'workspace.$.team': { member: userExist._id } }, { 'userExist.$.otherWorkspace': req.params.workspaceId }, { 'userExist.$.otherWorkspace': { role: 'User' } }] }
-            //     // const existingUser = await findOneAndUpdate({ _id: ObjectId(req.body.userId), 'workspace._id': ObjectId(req.params.workspaceId) });
-            // } else {
-            //     const userWork = new UserWorkspace({
-            //         _id: mongoose.Types.ObjectId(),
-            //         email: req.body.email,
-            //         invite: true,
-            //         workspace: []
-            //     });
-
-            //     userWork.otherWorkspace.push({
-            //         workspaceId: req.params.workspaceId
-            //     });
-
-            //     userWork.workspace.push({
-            //             _id: mongoose.Types.ObjectId(),
-            //             role: 'Admin',
-            //             workspaceName: req.body.email
-            //         });
-                
-            //     const data = await userWork.save();
-            //     // const result = await UserWorkspace.aggregate([
-            //     //     { $match: { $and: [{ _id: ObjectId(req.body.userId) }, { 'workspace._id': ObjectId(req.params.workspaceId) }] }}
-            //     // ]);
-            //     // _id: ObjectId(req.body.userId),
-
-            //     const updateTeam = await UserWorkspace.findOneAndUpdate({ 
-            //         _id: req.params.workspaceId,
-            //         // 'workspace._id': ObjectId(req.params.workspaceId) 
-            //     }, { $push: { 'workspace.$.team': { member: data._id } } }, { new: true });
-
-            //     // const doc = await UserWorkspace.findOneAndUpdate({ 
-            //     //     'workspace._id': ObjectId(req.params.workspaceId)
-            //     // }, { $set: { 'workspace.$.role': req.body.role } }, { upsert: true, new: true }); 
-            //     res.status(201).send({ 
-            //         message: 'Invitation Sent!'
-            //     });
-
-            // }
         } catch (e) {
             res.status(500).send({ error: e });
         }
-    },
-
+    }
 };

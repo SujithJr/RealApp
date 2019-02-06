@@ -12,20 +12,17 @@ module.exports = {
         const tracks = new Tracker({
             _id: new mongoose.Types.ObjectId(),
             desc: req.body.desc,
-            startTime: req.body.startTime,
-            endTime: req.body.endTime,
+            // startTime: req.body.startTime,
+            // endTime: req.body.endTime,
             totalTime: req.body.totalTime,
             project: req.body.projectId
         });
 
         try {
-            const proj = await Project.findOneAndUpdate({ 
-                _id: req.body.projectId 
-            }, {
-                $inc: {
-                    totalDuration: req.body.totalTime
-                }
-            });
+            const proj = await Project.findOneAndUpdate(
+                { _id: req.body.projectId }, 
+                { $inc: { totalDuration: req.body.totalTime } });
+
             if (!proj) {
                 return res.status(404).send({
                     message: 'Track detail Not Found'
@@ -66,9 +63,7 @@ module.exports = {
             if (data.length > 0) {
                 res.send({ data });
             } else {
-                res.status(404).send({
-                    message: 'No track list of projects to display. Start tracking projects'
-                });
+                res.status(404).send({ message: 'No track list of projects to display. Start tracking projects' });
             }
         } catch(err) {
             res.status(500).send(err);
@@ -79,7 +74,10 @@ module.exports = {
         const id = req.params.trackerId;
         const body = _.pick(req.body, ['desc', 'startTime', 'endTime', 'project']);
         try {
-            const data = await Tracker.findOneAndUpdate({ _id: id }, { $set: body }, { new: true }).populate({
+            const data = await Tracker.findOneAndUpdate(
+                { _id: id }, 
+                { $set: body }, 
+                { new: true }).populate({
                 path: 'project',
                 select: 'projectName totalDuration client -_id',
                 populate: {
@@ -90,9 +88,7 @@ module.exports = {
             console.log(data);
 
             if (!data) {
-                res.status(404).send({
-                    message: 'Project not found'
-                });
+                res.status(404).send({ message: 'Project not found' });
             } else {
                 res.send({ data });
             }
@@ -106,9 +102,7 @@ module.exports = {
         try {
             const data = await Tracker.findOneAndDelete({ _id: id });
             if (!data) {
-                res.status(404).send({
-                    message: 'Project not found'
-                });
+                res.status(404).send({ message: 'Project not found' });
             } else {
                 res.send({ data });
             }
